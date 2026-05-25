@@ -1,0 +1,48 @@
+name: poct_app
+description: "A new Flutter project."
+publish_to: 'none'
+version: 1.1.0+3
+
+environment:
+  sdk: '>=2.19.4 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+  english_words: ^4.0.0
+  provider: ^6.0.0
+
+  # GetX
+  get: ^4.6.5
+  get_storage: ^2.1.1
+  shared_preferences: ^2.2.2
+
+  permission_handler: ^11.3.0
+  flutter_blue_plus: ^1.5.2
+  flutter_web_bluetooth: ^0.2.2
+
+  camera: ^0.11.1
+  path_provider: ^2.1.5
+  path: ^1.9.1
+  saver_gallery: ^4.0.1
+  device_info_plus: ^11.3.3
+  fl_chart: ^0.69.0
+  file_selector: ^1.0.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+  flutter_launcher_icons: ^0.13.1
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: assets/icon/app_icon.png
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/icon/
