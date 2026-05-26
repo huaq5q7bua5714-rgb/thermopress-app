@@ -46,6 +46,7 @@ class HomeController extends GetxController with BleCallback {
 
   /// Current tab index
   int currentIndex = 0;
+  bool _handlingDisconnect = false;
 
   /// Current connected device info
   var bluetoothInfo = BluetoothDeviceInfo(
@@ -202,11 +203,7 @@ class HomeController extends GetxController with BleCallback {
     BluetoothDeviceInfo device,
   ) async {
     if (device.isConnected) {
-      // Disconnect
-      device.isConnected = false;
-      await BleManager.getInstance().disconnect();
-      bluetoothInfo.value = device;
-      devices.refresh();
+      await disconnectCurrentDevice();
       return;
     }
 
@@ -254,6 +251,22 @@ class HomeController extends GetxController with BleCallback {
         "Connection error",
         "Device not found.",
       );
+    }
+  }
+
+  Future<void> disconnectCurrentDevice() async {
+    final wasConnected = bluetoothInfo.value.isConnected ||
+        BleManager.getInstance().isConnected();
+
+    if (!wasConnected) {
+      _clearBleConnectionState();
+      return;
+    }
+
+    try {
+      await BleManager.getInstance().disconnect();
+    } finally {
+      await _handleDisconnected();
     }
   }
 
@@ -614,56 +627,71 @@ class HomeController extends GetxController with BleCallback {
   }
 
   @override
-  void onDisconnected() async {
+  void onDisconnected() {
+    unawaited(_handleDisconnected());
+  }
+
+  Future<void> _handleDisconnected() async {
+    if (_handlingDisconnect) return;
+    _handlingDisconnect = true;
+
     Get.log('蓝牙已断开');
 
-    final wasRecording = isRecording.value; // ✅【新增】记录断开前是否在测量
+    try {
+      final wasRecording = isRecording.value; // ✅【新增】记录断开前是否在测量
 
-    // ===== 统一 UI 提示（稍后可能被覆盖）=====
-    SnackBarManager.instance.showSnackBar(
-      "蓝牙已断开",
-      "",
-    );
+      // ===== 统一 UI 提示（稍后可能被覆盖）=====
+      SnackBarManager.instance.showSnackBar(
+        "蓝牙已断开",
+        "",
+      );
 
-    // ===== 如果正在录制，立刻停止 =====
-    if (wasRecording) {
-      isRecording.value = false;
-      _stopMockStream(); // 不自动切 mock，保持行为可预期
-    }
-
-    // ===== ✅【新增】断开时自动保存已测数据 =====
-    if (wasRecording && recordedPoints.isNotEmpty) {
-      try {
-        final pc = Get.find<PatientController>();
-        final p = pc.currentPatient.value;
-        final phone = p?.phone ?? 'unknown';
-
-        // 1) 保存 CSV
-        final path = await _saveToFile(phone);
-
-        // 2) 保存 summary（含文件路径）
-        if (path != null) {
-          await _save_summary_to_patient(path);
-        }
-
-        // 3) 清空本次缓存
-        recordedPoints.clear();
-        _activeSession = null;
-
-        // 4) 给用户一个明确反馈
-        SnackBarManager.instance.showSnackBar(
-          "蓝牙已断开",
-          "蓝牙已断开 测量数据已经自动保存",
-        );
-      } catch (e) {
-        Get.log('❌ Auto-save on disconnect failed: $e');
+      // ===== 如果正在录制，立刻停止 =====
+      if (wasRecording) {
+        isRecording.value = false;
+        _stopMockStream(); // 不自动切 mock，保持行为可预期
       }
+
+      // ===== ✅【新增】断开时自动保存已测数据 =====
+      if (wasRecording && recordedPoints.isNotEmpty) {
+        try {
+          final pc = Get.find<PatientController>();
+          final p = pc.currentPatient.value;
+          final phone = p?.phone ?? 'unknown';
+
+          // 1) 保存 CSV
+          final path = await _saveToFile(phone);
+
+          // 2) 保存 summary（含文件路径）
+          if (path != null) {
+            await _save_summary_to_patient(path);
+          }
+
+          // 3) 清空本次缓存
+          recordedPoints.clear();
+          _activeSession = null;
+
+          // 4) 给用户一个明确反馈
+          SnackBarManager.instance.showSnackBar(
+            "蓝牙已断开",
+            "蓝牙已断开 测量数据已经自动保存",
+          );
+        } catch (e) {
+          Get.log('❌ Auto-save on disconnect failed: $e');
+        }
+      }
+
+      // ===== 重置 BLE 数据解析缓存 =====
+      Ua200Receiver.reset();
+
+      // ===== 统一清连接状态（这是唯一权威源）=====
+      _clearBleConnectionState();
+    } finally {
+      _handlingDisconnect = false;
     }
+  }
 
-    // ===== 重置 BLE 数据解析缓存 =====
-    Ua200Receiver.reset();
-
-    // ===== 统一清连接状态（这是唯一权威源）=====
+  void _clearBleConnectionState() {
     bluetoothInfo.value.isConnected = false;
 
     for (final device in devices) {

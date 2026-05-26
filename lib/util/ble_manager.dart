@@ -31,6 +31,8 @@ class BleManager {
   BluetoothCharacteristic? _writeCharacteristic;
   BluetoothCharacteristic? _notifyCharacteristic;
   StreamSubscription<List<ScanResult>>? _scanSubscription;
+  StreamSubscription<BluetoothConnectionState>? _connectionStateSubscription;
+  StreamSubscription<List<int>>? _notifySubscription;
   final Map<String, BluetoothDevice> _scannedDevices = {};
 
   // Callback interface
@@ -136,6 +138,10 @@ class BleManager {
       print(
           "Connecting to device: ${device.platformName} (${device.remoteId}) ...");
 
+      if (_device != null && _device!.remoteId != device.remoteId) {
+        await disconnect();
+      }
+
       await device.connect(
         timeout: const Duration(seconds: 4),
         autoConnect: false,
@@ -144,7 +150,9 @@ class BleManager {
       _device = device;
 
       // Listen to connection state changes
-      device.connectionState.listen((BluetoothConnectionState state) {
+      await _connectionStateSubscription?.cancel();
+      _connectionStateSubscription =
+          device.connectionState.listen((BluetoothConnectionState state) {
         Get.log("Connection state changed: $state");
         if (state == BluetoothConnectionState.disconnected) {
           // Device disconnected
@@ -211,14 +219,32 @@ class BleManager {
 
   // Disconnect
   Future<void> disconnect() async {
-    if (_device != null) {
-      try {
-        await _device!.disconnect();
-      } catch (_) {}
-      _device = null;
-      _notifyCharacteristic = null;
-      _writeCharacteristic = null;
+    final device = _device;
+    final notify = _notifyCharacteristic;
+
+    try {
+      if (notify != null && notify.isNotifying) {
+        await notify.setNotifyValue(false);
+      }
+    } catch (e) {
+      Get.log("Disable notify failed during disconnect: $e");
     }
+
+    if (device != null) {
+      try {
+        await device.disconnect();
+      } catch (e) {
+        Get.log("Device disconnect failed: $e");
+      }
+    }
+
+    await _notifySubscription?.cancel();
+    await _connectionStateSubscription?.cancel();
+    _notifySubscription = null;
+    _connectionStateSubscription = null;
+    _device = null;
+    _notifyCharacteristic = null;
+    _writeCharacteristic = null;
   }
 
   // Send data to device
@@ -258,7 +284,8 @@ class BleManager {
       Get.log(
           "setNotifyValue(true) called, isNotifying = ${_notifyCharacteristic!.isNotifying}");
 
-      _notifyCharacteristic!.value.listen((value) {
+      await _notifySubscription?.cancel();
+      _notifySubscription = _notifyCharacteristic!.value.listen((value) {
         print("🔵 Notify value: $value");
         _callback?.onDataReceived(value);
       });

@@ -37,14 +37,13 @@ class BluetoothSetPage extends StatelessWidget {
             Obx(() {
               final info = controller.bluetoothInfo.value;
               final bool isConnected = info.isConnected;
-              final String name = info.platformName.isNotEmpty
-                  ? info.platformName
-                  : '无设备';
+              final String name =
+                  info.platformName.isNotEmpty ? info.platformName : '无设备';
 
               return Container(
                 width: double.infinity,
                 padding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(16),
@@ -105,13 +104,8 @@ class BluetoothSetPage extends StatelessWidget {
                     const SizedBox(width: 8),
                     if (isConnected)
                       TextButton(
-                        onPressed: () {
-                          // 断开连接：直接用你现有的 BleManager 逻辑
-                          controller.bluetoothInfo.value.isConnected = false;
-                          controller.bluetoothInfo.refresh();
-                          // 真正的断连在 BleManager.disconnect() 里做，
-                          // 你也可以在这里加一行 BleManager.getInstance().disconnect();
-                          // 为保持和列表页一致，这里只做 UI 状态处理即可。
+                        onPressed: () async {
+                          await controller.disconnectCurrentDevice();
                         },
                         child: const Text(
                           '断开连接',
@@ -167,7 +161,7 @@ class BluetoothSetPage extends StatelessWidget {
             Expanded(
               child: Obx(() {
                 final List<BluetoothDeviceInfo> devices =
-                controller.devices.toList();
+                    controller.devices.toList();
 
                 if (devices.isEmpty) {
                   return const Center(
@@ -192,9 +186,8 @@ class BluetoothSetPage extends StatelessWidget {
                     final String name = device.platformName.isNotEmpty
                         ? device.platformName
                         : '未知设备';
-                    final String id = device.address.isNotEmpty
-                        ? device.address
-                        : '未知ID';
+                    final String id =
+                        device.address.isNotEmpty ? device.address : '未知ID';
 
                     return Container(
                       decoration: BoxDecoration(
