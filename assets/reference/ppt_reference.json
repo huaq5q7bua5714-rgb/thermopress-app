@@ -1,111 +1,265 @@
 {
-  "version": "ppt_reference_v1",
+  "version": "ppt_reference_v1_1_literature_catalog",
   "unit": "N/cm2",
   "default_probe_area_cm2": 1.767,
   "references": [
     {
       "region": "head_face",
       "quality": "anatomical_approximation",
-      "source": "Tomschi et al. 2025 and internal anatomical mapping",
-      "note": "第一版解剖区域近似库，建议后续替换为本项目实测健康基线。",
+      "source": "Castien et al. 2018; Tomschi et al. 2025; WHO 2008 mapping",
+      "note": "头面部第一版参考由颅颈区PPT综述、多关节健康百分位和WHO穴位定位共同支撑，建议后续用本项目健康对照数据校准。",
       "p5": 10,
       "p10": 14,
       "p25": 22,
       "p50": 35,
       "p75": 50,
       "p90": 65,
-      "p95": 75
+      "p95": 75,
+      "supporting_sources": [
+        "castien_2018_headache_craniocervical",
+        "tomschi_2025_joint_percentiles",
+        "who_2008_acupoint_locations"
+      ]
     },
     {
       "region": "neck_shoulder",
       "quality": "anatomical_approximation",
-      "source": "Tomschi et al. 2025 and internal anatomical mapping",
-      "note": "第一版解剖区域近似库，建议后续用颈肩部健康志愿者数据校准。",
+      "source": "Suzuki et al. 2022; Castien et al. 2018; Tomschi et al. 2025",
+      "note": "颈肩部参考结合颈肩/腰背QST综述、头痛颅颈区PPT研究和健康多关节百分位，适合用于筛查提示而非诊断结论。",
       "p5": 12,
       "p10": 17,
       "p25": 28,
       "p50": 42,
       "p75": 60,
       "p90": 78,
-      "p95": 90
+      "p95": 90,
+      "supporting_sources": [
+        "suzuki_2022_neck_lowback_qst_review",
+        "castien_2018_headache_craniocervical",
+        "tomschi_2025_joint_percentiles"
+      ]
     },
     {
       "region": "thoracic_back",
       "quality": "anatomical_approximation",
-      "source": "Tomschi et al. 2025 and internal anatomical mapping",
-      "note": "第一版解剖区域近似库。",
+      "source": "Tomschi et al. 2025; Suzuki et al. 2022; WHO 2008 mapping",
+      "note": "胸背部参考属于区域化近似库，可结合背俞区主诉和对侧/相邻区域比较使用。",
       "p5": 18,
       "p10": 23,
       "p25": 35,
       "p50": 50,
       "p75": 70,
       "p90": 90,
-      "p95": 105
+      "p95": 105,
+      "supporting_sources": [
+        "tomschi_2025_joint_percentiles",
+        "suzuki_2022_neck_lowback_qst_review",
+        "who_2008_acupoint_locations"
+      ]
     },
     {
       "region": "lumbosacral",
       "quality": "anatomical_approximation",
-      "source": "Tomschi et al. 2025 and internal anatomical mapping",
-      "note": "第一版解剖区域近似库，可优先用项目已有腰背部对照测试继续校准。",
+      "source": "Suzuki et al. 2022; Suzuki et al. 2023; Tomschi et al. 2025",
+      "note": "腰骶部参考结合腰背痛QST综述、健康成人PPT参考区间和多关节百分位，后续优先用本项目腰背部健康基线校准。",
       "p5": 20,
       "p10": 25,
       "p25": 38,
       "p50": 55,
       "p75": 75,
       "p90": 95,
-      "p95": 110
+      "p95": 110,
+      "supporting_sources": [
+        "suzuki_2022_neck_lowback_qst_review",
+        "suzuki_2023_japanese_reference_intervals",
+        "tomschi_2025_joint_percentiles"
+      ]
     },
     {
       "region": "abdomen",
       "quality": "limited_acupoint_literature",
-      "source": "CPID acupoint PPT literature and internal anatomical mapping",
-      "note": "腹部参考值受穴位和病种影响较大，第一版仅作提示性参考。",
+      "source": "Liao et al. 2023; Ben et al. 2012; WHO 2008 mapping",
+      "note": "腹部参考主要来自慢性盆腔炎穴位PPT和胃肠疾病经络痛敏点研究，属于穴位/病种锚点，应结合主诉类型解释。",
       "p5": 8,
       "p10": 12,
       "p25": 20,
       "p50": 32,
       "p75": 45,
       "p90": 60,
-      "p95": 70
+      "p95": 70,
+      "supporting_sources": [
+        "liao_2023_cpid_acupoints",
+        "ben_2012_gastric_ulcer_gastritis",
+        "who_2008_acupoint_locations"
+      ]
     },
     {
       "region": "upper_limb",
       "quality": "anatomical_approximation",
-      "source": "Tomschi et al. 2025 and internal anatomical mapping",
-      "note": "第一版解剖区域近似库。",
+      "source": "Tomschi et al. 2025; Suzuki et al. 2023; WHO 2008 mapping",
+      "note": "上肢第一版使用多关节健康百分位和健康成人PPT参考区间作区域近似，建议积累本项目实测健康基线后细分肘、腕、前臂测点。",
       "p5": 12,
       "p10": 16,
       "p25": 25,
       "p50": 38,
       "p75": 55,
       "p90": 70,
-      "p95": 82
+      "p95": 82,
+      "supporting_sources": [
+        "tomschi_2025_joint_percentiles",
+        "suzuki_2023_japanese_reference_intervals",
+        "who_2008_acupoint_locations"
+      ]
     },
     {
       "region": "knee",
       "quality": "direct_joint_reference",
-      "source": "Tomschi et al. 2025; knee OA PPT ranges used as low-threshold anchor",
-      "note": "膝周区域第一版优先参考膝关节相关PPT分布。",
+      "source": "Tomschi et al. 2025; Moss et al. 2016; Previtali et al. 2022",
+      "note": "膝周区域由健康膝关节PPT百分位和膝骨关节炎痛敏化研究共同支撑，适合输出低百分位敏化提示。",
       "p5": 28,
       "p10": 35,
       "p25": 50,
       "p50": 70,
       "p75": 92,
       "p90": 112,
-      "p95": 125
+      "p95": 125,
+      "supporting_sources": [
+        "tomschi_2025_joint_percentiles",
+        "moss_2016_knee_oa",
+        "previtali_2022_knee_oa_meta"
+      ]
     },
     {
       "region": "lower_limb_distal",
       "quality": "limited_acupoint_literature",
-      "source": "Lower-limb acupoint PPT literature and internal anatomical mapping",
-      "note": "下肢远端穴位差异较大，第一版用于趋势和粗分层。",
+      "source": "Liao et al. 2023; Chen et al. 2015; Suzuki et al. 2023; WHO 2008 mapping",
+      "note": "下肢远端参考结合三阴交、足三里、地机等穴位PPT研究和健康成人下肢测点参考区间，适合趋势跟踪和粗分层。",
       "p5": 15,
       "p10": 20,
       "p25": 32,
       "p50": 48,
       "p75": 68,
       "p90": 85,
-      "p95": 100
+      "p95": 100,
+      "supporting_sources": [
+        "liao_2023_cpid_acupoints",
+        "chen_2015_sp8_dysmenorrhea",
+        "suzuki_2023_japanese_reference_intervals",
+        "who_2008_acupoint_locations"
+      ]
+    }
+  ],
+  "probe": {
+    "diameter_cm": 1.5,
+    "area_cm2": 1.767,
+    "area_formula": "pi * (1.5 / 2)^2"
+  },
+  "unit_conversions": {
+    "N_per_cm2_to_kPa": 10,
+    "kPa_to_N_per_cm2": 0.1,
+    "kgf_per_cm2_to_N_per_cm2": 9.80665
+  },
+  "reference_policy": {
+    "primary_engine": "Only normative or region-calibrated percentile entries in references[] are used for automatic percentile interpolation.",
+    "disease_anchor": "Disease and acupoint studies are retained as explanatory anchors and should not replace healthy percentile thresholds unless a matched control distribution is available.",
+    "temperature_policy": "Skin temperature is displayed as auxiliary trend information and is not used alone for sensitization classification."
+  },
+  "source_catalog": [
+    {
+      "id": "tomschi_2025_joint_percentiles",
+      "type": "normative_percentile",
+      "citation": "Tomschi F, Schmidt A, Brühl M, Hilberg T. Reference Values of Joint-Specific Pressure Pain Thresholds in Healthy Male Individuals. European Journal of Pain, 2025.",
+      "pmcid": "PMC12123253",
+      "doi": "10.1002/ejp.70050",
+      "role": "健康人群多关节PPT百分位主库，可直接支撑APP的区域百分位判别。",
+      "unit_note": "文献以N/cm²给出，和APP内部单位一致。"
+    },
+    {
+      "id": "suzuki_2022_neck_lowback_qst_review",
+      "type": "regional_normative_support",
+      "citation": "Suzuki H, Tahara S, Mitsuda M, et al. Current Concept of Quantitative Sensory Testing and Pressure Pain Threshold in Neck/Shoulder and Low Back Pain. Healthcare, 2022.",
+      "pmcid": "PMC9408781",
+      "doi": "10.3390/healthcare10081485",
+      "role": "补充颈肩、腰背区域QST/PPT测点选择、影响因素和测量一致性依据。",
+      "unit_note": "不同研究单位不完全一致，纳入APP主库前需统一为N/cm²。"
+    },
+    {
+      "id": "suzuki_2023_japanese_reference_intervals",
+      "type": "regional_reference_interval",
+      "citation": "Suzuki H, Tahara S, Mitsuda M, et al. Reference intervals and sources of variation of pressure pain threshold for quantitative sensory testing in a Japanese population. Scientific Reports, 2023.",
+      "pmid": "37563245",
+      "doi": "10.1038/s41598-023-40201-w",
+      "role": "提供健康成人PPT参考区间及年龄、性别、测点等影响因素，可用于后续本项目健康基线校准。",
+      "unit_note": "导入数值时需记录测点、探头面积、加载速率和单位。"
+    },
+    {
+      "id": "castien_2018_headache_craniocervical",
+      "type": "disease_anchor",
+      "citation": "Castien R F, van der Wouden J C, De Hertogh W. Pressure pain thresholds over the cranio-cervical region in headache: a systematic review and meta-analysis. The Journal of Headache and Pain, 2018.",
+      "pmcid": "PMC5786597",
+      "doi": "10.1186/s10194-018-0833-7",
+      "role": "支撑头面部、颈肩相关主诉的颅颈区压痛敏化解释。",
+      "unit_note": "作为病种锚点，不直接替代健康百分位。"
+    },
+    {
+      "id": "moss_2016_knee_oa",
+      "type": "disease_anchor",
+      "citation": "Moss P, Knight E, Wright A. Subjects with Knee Osteoarthritis Exhibit Widespread Hyperalgesia to Pressure and Cold. PLoS ONE, 2016.",
+      "pmcid": "PMC4726459",
+      "doi": "10.1371/journal.pone.0147526",
+      "role": "支撑膝骨关节炎场景下膝周及远端PPT降低、广泛痛觉敏化的解释。",
+      "unit_note": "1 cm²探头、固定加载速率的研究设计可作为膝关节病种锚点。"
+    },
+    {
+      "id": "previtali_2022_knee_oa_meta",
+      "type": "disease_anchor_meta_analysis",
+      "citation": "Previtali D, Capone G, Marchettini P, Candrian C, Zaffagnini S, Filardo G. High Prevalence of Pain Sensitization in Knee Osteoarthritis: A Meta-Analysis with Meta-Regression. Cartilage, 2022.",
+      "pmcid": "PMC9137298",
+      "doi": "10.1177/19476035221087698",
+      "role": "提供膝骨关节炎痛敏化高患病率和PPT降低方向的系统综述证据。",
+      "unit_note": "Meta分析用于疾病解释，不直接作为单个区域百分位表。"
+    },
+    {
+      "id": "liao_2023_cpid_acupoints",
+      "type": "acupoint_reference",
+      "citation": "Liao C, Tan Y, Wang K, Wen X, Hu X, Huang Y, Li Y. The Impact and Correlation of Anxiety and Depression on Pressure Pain Threshold of Acupoints in Patients with Chronic Pelvic Inflammatory Disease. Pain Research and Management, 2023.",
+      "pmcid": "PMC10684321",
+      "doi": "10.1155/2023/3315090",
+      "role": "覆盖关元、三阴交、足三里等腹部和下肢高频穴位，补充穴位级PPT依据。",
+      "unit_note": "应按穴位、组别和单位单独入库，避免混入通用健康百分位。"
+    },
+    {
+      "id": "ben_2012_gastric_ulcer_gastritis",
+      "type": "acupoint_disease_mapping",
+      "citation": "Ben H, Li L, Rong P J, et al. Observation of Pain-Sensitive Points along the Meridians in Patients with Gastric Ulcer or Gastritis. Evidence-Based Complementary and Alternative Medicine, 2012.",
+      "pmcid": "PMC3511840",
+      "doi": "10.1155/2012/130802",
+      "role": "支撑胃肠主诉与胃经、腹背相关痛敏反应点的映射。",
+      "unit_note": "主要作为病种-穴位映射和敏化分布依据。"
+    },
+    {
+      "id": "chen_2015_sp8_dysmenorrhea",
+      "type": "dynamic_acupoint_reference",
+      "citation": "Chen S, Miao Y, Nan Y, et al. The Study of Dynamic Characteristic of Acupoints Based on the Primary Dysmenorrhea Patients with the Tenderness Reflection on Diji (SP 8). Evidence-Based Complementary and Alternative Medicine, 2015.",
+      "pmcid": "PMC4487270",
+      "doi": "10.1155/2015/158012",
+      "role": "支撑痛经场景下地机SP8等穴位痛敏动态变化，不直接替代健康百分位。",
+      "unit_note": "适合作为痛经主诉下的病种锚点。"
+    },
+    {
+      "id": "wang_2023_acupoint_temperature",
+      "type": "temperature_limitation",
+      "citation": "Wang X, Zuo G, Liu J, et al. Skin Temperature of Acupoints in Health and Primary Dysmenorrhea Patients: A Systematic Review and Meta-Analysis. Journal of Pain Research, 2023.",
+      "doi": "10.2147/JPR.S411923",
+      "role": "说明穴位皮肤温度差异量级较小，温度适合作辅助趋势而非核心阳性判别。",
+      "unit_note": "温度不进入PPT百分位插值。"
+    },
+    {
+      "id": "who_2008_acupoint_locations",
+      "type": "mapping_standard",
+      "citation": "WHO Regional Office for the Western Pacific. WHO Standard Acupuncture Point Locations in the Western Pacific Region. Manila: WHO WPRO, 2008.",
+      "role": "支撑穴位名称、定位、经络归属和身体区域映射。",
+      "unit_note": "非PPT数值来源。"
     }
   ]
 }
