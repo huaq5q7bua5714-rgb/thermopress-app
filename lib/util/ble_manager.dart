@@ -299,16 +299,35 @@ class BleManager {
 
   /// ✅【新增】向 MCU 发送单字节命令（如 0xAA / 0xFF）
   Future<void> sendCmdByte(int cmd) async {
-    if (_writeCharacteristic == null) {
+    final write = _writeCharacteristic;
+    if (write == null) {
       throw Exception("WRITE characteristic not ready");
     }
 
     final data = <int>[cmd & 0xFF];
+    final withoutResponse =
+        write.properties.writeWithoutResponse || !write.properties.write;
 
-    await _writeCharacteristic!.write(
-      data,
-      withoutResponse: true, // MCU 不需要 response
-    );
+    try {
+      await write
+          .write(
+            data,
+            withoutResponse: withoutResponse,
+          )
+          .timeout(const Duration(seconds: 2));
+    } catch (e) {
+      if (withoutResponse && write.properties.write) {
+        Get.log("WRITE without response failed, retrying with response: $e");
+        await write
+            .write(
+              data,
+              withoutResponse: false,
+            )
+            .timeout(const Duration(seconds: 2));
+      } else {
+        rethrow;
+      }
+    }
 
     Get.log(
         "📤 CMD sent: 0x${cmd.toRadixString(16).padLeft(2, '0').toUpperCase()}");

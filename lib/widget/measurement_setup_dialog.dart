@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:poct_app/data/measurement_models.dart';
 
 class MeasurementSetupDialog extends StatefulWidget {
@@ -60,16 +59,21 @@ class _MeasurementSetupDialogState extends State<MeasurementSetupDialog> {
       ),
       actions: [
         TextButton(
-          onPressed: () => Get.back<MeasurementSelection?>(),
+          onPressed: () {
+            Navigator.of(context, rootNavigator: true)
+                .pop<MeasurementSelection?>(null);
+          },
           child: const Text('取消'),
         ),
         FilledButton(
-          onPressed: () => Get.back(
-            result: MeasurementSelection(
-              bodyRegion: _region,
-              symptomType: _symptom,
-            ),
-          ),
+          onPressed: () {
+            Navigator.of(context, rootNavigator: true).pop(
+              MeasurementSelection(
+                bodyRegion: _region,
+                symptomType: _symptom,
+              ),
+            );
+          },
           child: const Text('开始测量'),
         ),
       ],

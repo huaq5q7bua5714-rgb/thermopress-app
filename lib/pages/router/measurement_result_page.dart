@@ -67,7 +67,7 @@ class _MeasurementResultPageState extends State<MeasurementResultPage> {
 
   Widget _metric(String label, String value) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: const Color(0xFFF4F7FB),
         borderRadius: BorderRadius.circular(10),
@@ -75,12 +75,29 @@ class _MeasurementResultPageState extends State<MeasurementResultPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label,
-              style: const TextStyle(fontSize: 12, color: Colors.black54)),
-          const SizedBox(height: 4),
           Text(
-            value,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(fontSize: 12, color: Colors.black54),
+          ),
+          const SizedBox(height: 3),
+          Expanded(
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  value,
+                  maxLines: 1,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ),
           ),
         ],
       ),
@@ -119,7 +136,7 @@ class _MeasurementResultPageState extends State<MeasurementResultPage> {
             const SizedBox(height: 14),
             GridView.count(
               crossAxisCount: 2,
-              childAspectRatio: 2.5,
+              childAspectRatio: 1.85,
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               mainAxisSpacing: 10,
