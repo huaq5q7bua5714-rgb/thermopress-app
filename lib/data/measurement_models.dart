@@ -183,7 +183,7 @@ class CurveAnalysisResult {
 
   factory CurveAnalysisResult.invalid(
     String reason, {
-    String algorithmVersion = 'ppt_v1_stop_window',
+    String algorithmVersion = 'ppt_v2_press_peak',
   }) {
     return CurveAnalysisResult(
       valid: false,

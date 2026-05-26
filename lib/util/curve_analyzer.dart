@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:poct_app/data/measurement_models.dart';
 
 class CurveAnalyzer {
-  static const String algorithmVersion = 'ppt_v1_stop_window';
+  static const String algorithmVersion = 'ppt_v2_press_peak';
 
   static CurveAnalysisResult analyze(List<MeasurementPoint> samples) {
     final clean = samples
@@ -38,7 +38,6 @@ class CurveAnalyzer {
     final smoothForce = _movingAverage(rawForce, 5);
 
     final peakForce = smoothForce.reduce(max);
-    final peakIndex = smoothForce.indexOf(peakForce);
     if (peakForce < 2.0) {
       return CurveAnalysisResult.invalid(
         '压力峰值过低，未形成有效按压',
@@ -63,12 +62,18 @@ class CurveAnalyzer {
       }
     }
 
-    final lastTime = seconds.last;
-    final windowStart = max(seconds.first, lastTime - 0.5);
-    var pptIndex = peakIndex;
+    final pressSegment = _dominantPressSegment(smoothForce, contactThreshold);
+    if (pressSegment == null) {
+      return CurveAnalysisResult.invalid(
+        '未检测到有效按压段',
+        algorithmVersion: algorithmVersion,
+      );
+    }
+
+    var pptIndex = pressSegment.start;
     var pptValue = double.negativeInfinity;
-    for (int i = 0; i < smoothForce.length; i++) {
-      if (seconds[i] >= windowStart && smoothForce[i] > pptValue) {
+    for (int i = pressSegment.start; i <= pressSegment.end; i++) {
+      if (smoothForce[i] > pptValue) {
         pptValue = smoothForce[i];
         pptIndex = i;
       }
@@ -76,7 +81,7 @@ class CurveAnalyzer {
 
     if (!pptValue.isFinite || pptValue <= baseline + 0.5) {
       return CurveAnalysisResult.invalid(
-        '停止前未检测到有效PPT峰值',
+        '未检测到有效PPT峰值',
         algorithmVersion: algorithmVersion,
       );
     }
@@ -116,6 +121,39 @@ class CurveAnalyzer {
       peakPptRatio: peakPptRatio,
       qualityScore: qualityScore,
     );
+  }
+
+  static _PressSegment? _dominantPressSegment(
+    List<double> force,
+    double threshold,
+  ) {
+    _PressSegment? best;
+    int? start;
+
+    for (int i = 0; i < force.length; i++) {
+      final inPress = force[i] >= threshold;
+      if (inPress && start == null) {
+        start = i;
+      }
+
+      final isLast = i == force.length - 1;
+      if (start != null && (!inPress || isLast)) {
+        final end = inPress && isLast ? i : i - 1;
+        if (end >= start) {
+          var segmentPeak = double.negativeInfinity;
+          for (int j = start; j <= end; j++) {
+            segmentPeak = max(segmentPeak, force[j]);
+          }
+          final segment = _PressSegment(start, end, segmentPeak);
+          if (best == null || segment.peak > best.peak) {
+            best = segment;
+          }
+        }
+        start = null;
+      }
+    }
+
+    return best;
   }
 
   static List<double> _movingAverage(List<double> values, int window) {
@@ -179,4 +217,12 @@ class CurveAnalyzer {
 
     return score.clamp(0.0, 100.0).toDouble();
   }
+}
+
+class _PressSegment {
+  final int start;
+  final int end;
+  final double peak;
+
+  const _PressSegment(this.start, this.end, this.peak);
 }

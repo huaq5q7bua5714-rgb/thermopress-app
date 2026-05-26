@@ -34,7 +34,8 @@ class DataPoint {
 }
 
 class HomeController extends GetxController with BleCallback {
-  static const double _probeAreaCm2 = 1.0;
+  // Probe diameter 1.5 cm: area = pi * 0.75 * 0.75.
+  static const double _probeAreaCm2 = 1.767;
 
   /// Bottom navigation pages
   final List<Widget> pageList = const [

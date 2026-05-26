@@ -1,7 +1,7 @@
 {
   "version": "ppt_reference_v1",
   "unit": "N/cm2",
-  "default_probe_area_cm2": 1.0,
+  "default_probe_area_cm2": 1.767,
   "references": [
     {
       "region": "head_face",
