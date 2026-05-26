@@ -5,6 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:poct_app/data/measurement_models.dart';
+import 'package:poct_app/pages/router/measurement_result_page.dart';
+import 'package:poct_app/util/curve_analyzer.dart';
+import 'package:poct_app/util/reference_engine.dart';
+import 'package:poct_app/widget/measurement_setup_dialog.dart';
 
 import 'package:poct_app/util/ble_manager.dart';
 import 'package:poct_app/util/permission_util.dart';
@@ -29,6 +34,8 @@ class DataPoint {
 }
 
 class HomeController extends GetxController with BleCallback {
+  static const double _probeAreaCm2 = 1.0;
+
   /// Bottom navigation pages
   final List<Widget> pageList = const [
     WorkspacePage(),
@@ -73,6 +80,8 @@ class HomeController extends GetxController with BleCallback {
   /// Recorded data for saving
   final List<DataPoint> recordedPoints = [];
 
+  MeasurementSessionDraft? _activeSession;
+
   /// Max number of cached points for curve display
   static const int maxPoints = 500;
 
@@ -86,6 +95,7 @@ class HomeController extends GetxController with BleCallback {
   // 是否启用 Mock：当 BLE 未连接时自动启用
   bool get _shouldUseMock => !bluetoothInfo.value.isConnected;
 
+  // ignore: unused_element
   void _startMockStream() {
     _stopMockStream();
     _mockTick = 0;
@@ -284,12 +294,19 @@ class HomeController extends GetxController with BleCallback {
       final phone = p?.phone ?? 'unknown';
 
       final path = await _saveToFile(phone); // ✅先拿到文件路径
+      MeasurementSummary? summary;
       if (path != null) {
-        _save_summary_to_patient(path); // ✅再保存 summary（含 filePath）
+        summary =
+            await _save_summary_to_patient(path); // ✅再保存 summary（含 filePath）
       }
 
       // 清空本次录制缓存（不清 points，方便停下来看图）
       recordedPoints.clear();
+      _activeSession = null;
+      final savedSummary = summary;
+      if (savedSummary != null) {
+        Get.to(() => MeasurementResultPage(summary: savedSummary));
+      }
       return;
     }
 
@@ -306,9 +323,33 @@ class HomeController extends GetxController with BleCallback {
       return;
     }
 
+    // 未连接蓝牙时禁止测量
+    if (_shouldUseMock) {
+      SnackBarManager.instance.showSnackBar(
+        "未连接设备",
+        "请先在蓝牙页连接设备后再开始测量。",
+      );
+      return;
+    }
+
+    final selection = await Get.dialog<MeasurementSelection>(
+      const MeasurementSetupDialog(),
+      barrierDismissible: false,
+    );
+    if (selection == null) return;
+
+    final sessionStart = DateTime.now();
+    _activeSession = MeasurementSessionDraft(
+      sessionId: 'S${sessionStart.millisecondsSinceEpoch}',
+      startTime: sessionStart,
+      bodyRegion: selection.bodyRegion,
+      symptomType: selection.symptomType,
+      algorithmVersion: CurveAnalyzer.algorithmVersion,
+    );
+
     // ✅✅【新增】设置本次录制的时间零点（非常关键）
     recordingStartEpochMs.value =
-        DateTime.now().millisecondsSinceEpoch.toDouble();
+        sessionStart.millisecondsSinceEpoch.toDouble();
 
     // ✅ 关键：清空曲线数据，不然会接着上一次画
     points.clear();
@@ -319,15 +360,6 @@ class HomeController extends GetxController with BleCallback {
 
     // 清空本次录制缓存
     recordedPoints.clear();
-
-    // 未连接蓝牙时禁止测量
-    if (_shouldUseMock) {
-      SnackBarManager.instance.showSnackBar(
-        "未连接设备",
-        "请先在蓝牙页连接设备后再开始测量。",
-      );
-      return;
-    }
 
     isRecording.value = true;
 
@@ -340,14 +372,14 @@ class HomeController extends GetxController with BleCallback {
   }
 
   /// ✅【新增 2】把 recordedPoints 计算成摘要，保存到 PatientController
-  void _save_summary_to_patient(String filePath) {
-    if (recordedPoints.isEmpty) return;
+  Future<MeasurementSummary?> _save_summary_to_patient(String filePath) async {
+    if (recordedPoints.isEmpty) return null;
 
     final pc = Get.find<PatientController>();
     final p = pc.currentPatient.value;
     if (p == null) {
       Get.log('⚠ No current patient selected, skip summary saving.');
-      return;
+      return null;
     }
 
     final startTime = recordedPoints.first.time;
@@ -372,10 +404,47 @@ class HomeController extends GetxController with BleCallback {
       sumTemp += dp.temperature;
     }
 
+    final fallbackStart = recordedPoints.first.time;
+    final session = _activeSession ??
+        MeasurementSessionDraft(
+          sessionId: 'S${fallbackStart.millisecondsSinceEpoch}',
+          startTime: fallbackStart,
+          bodyRegion: BodyRegion.lumbosacral,
+          symptomType: SymptomType.skipped,
+          algorithmVersion: CurveAnalyzer.algorithmVersion,
+        );
+
+    final analysisPoints = recordedPoints
+        .map(
+          (p) => MeasurementPoint(
+            time: p.time,
+            temperature: p.temperature,
+            force: p.force,
+          ),
+        )
+        .toList();
+    final curve = CurveAnalyzer.analyze(analysisPoints);
+    final reference = curve.valid
+        ? await ReferenceEngine.evaluate(
+            bodyRegion: session.bodyRegion,
+            pptForce: curve.pptValue,
+            probeAreaCm2: _probeAreaCm2,
+          )
+        : ReferenceResult.unavailable(note: curve.invalidReason);
+    final assessment = SensitizationEngine.evaluate(
+      curve: curve,
+      reference: reference,
+    );
+
     final summary = MeasurementSummary(
+      sessionId: session.sessionId,
       startTime: startTime,
       endTime: endTime,
       count: count,
+      bodyRegion: BodyRegions.id(session.bodyRegion),
+      symptomType: SymptomTypes.id(session.symptomType),
+      algorithmVersion: curve.algorithmVersion,
+      probeAreaCm2: _probeAreaCm2,
       maxForce: maxForce,
       minForce: minForce,
       avgForce: sumForce / count,
@@ -383,11 +452,29 @@ class HomeController extends GetxController with BleCallback {
       minTemp: minTemp,
       avgTemp: sumTemp / count,
       filePath: filePath,
+      pptValue: curve.pptValue,
+      pptPressure: reference.pptPressure,
+      pptTimeSec: curve.pptTimeSec,
+      pptTemp: curve.pptTemperature,
+      peakForce: curve.peakForce,
+      riseRate: curve.riseRate,
+      slopeChangeScore: curve.slopeChangeScore,
+      peakPptRatio: curve.peakPptRatio,
+      curveQualityScore: curve.qualityScore,
+      curveValid: curve.valid,
+      curveInvalidReason: curve.invalidReason,
+      referencePercentile: reference.percentile,
+      referenceStatus: reference.status,
+      referenceSource: reference.source,
+      referenceQuality: reference.quality,
+      sensitizationLevel: assessment.level,
+      suggestionText: assessment.suggestion,
     );
 
     pc.addMeasurementRecord(p.phone, summary); // ✅新增：写入历史
 
     Get.log('✅ Summary saved for patient ${p.phone}');
+    return summary;
   }
 
   Future<String?> _saveToFile(String phone) async {
@@ -555,11 +642,12 @@ class HomeController extends GetxController with BleCallback {
 
         // 2) 保存 summary（含文件路径）
         if (path != null) {
-          _save_summary_to_patient(path);
+          await _save_summary_to_patient(path);
         }
 
         // 3) 清空本次缓存
         recordedPoints.clear();
+        _activeSession = null;
 
         // 4) 给用户一个明确反馈
         SnackBarManager.instance.showSnackBar(

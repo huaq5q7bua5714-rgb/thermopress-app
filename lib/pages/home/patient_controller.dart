@@ -1,6 +1,8 @@
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:poct_app/data/measurement_models.dart';
 import 'dart:io';
+
 /// 病人模型
 class Patient {
   final String name;
@@ -36,9 +38,14 @@ class Patient {
 
 /// 单次测量摘要（用于在 Patient Detail 中展示“最近一次测量”）
 class MeasurementSummary {
+  final String sessionId;
   final DateTime startTime;
   final DateTime endTime;
   final int count;
+  final String bodyRegion;
+  final String symptomType;
+  final String algorithmVersion;
+  final double probeAreaCm2;
 
   // Force
   final double maxForce;
@@ -50,11 +57,33 @@ class MeasurementSummary {
   final double minTemp;
   final double avgTemp;
   final String filePath;
+  final double pptValue;
+  final double pptPressure;
+  final double pptTimeSec;
+  final double pptTemp;
+  final double peakForce;
+  final double riseRate;
+  final double slopeChangeScore;
+  final double peakPptRatio;
+  final double curveQualityScore;
+  final bool curveValid;
+  final String curveInvalidReason;
+  final double referencePercentile;
+  final String referenceStatus;
+  final String referenceSource;
+  final String referenceQuality;
+  final String sensitizationLevel;
+  final String suggestionText;
 
   MeasurementSummary({
+    this.sessionId = '',
     required this.startTime,
     required this.endTime,
     required this.count,
+    this.bodyRegion = 'lumbosacral',
+    this.symptomType = 'skipped',
+    this.algorithmVersion = '',
+    this.probeAreaCm2 = 1.0,
     required this.maxForce,
     required this.minForce,
     required this.avgForce,
@@ -62,52 +91,136 @@ class MeasurementSummary {
     required this.minTemp,
     required this.avgTemp,
     required this.filePath,
+    this.pptValue = 0,
+    this.pptPressure = 0,
+    this.pptTimeSec = 0,
+    this.pptTemp = 0,
+    this.peakForce = 0,
+    this.riseRate = 0,
+    this.slopeChangeScore = 0,
+    this.peakPptRatio = 0,
+    this.curveQualityScore = 0,
+    this.curveValid = false,
+    this.curveInvalidReason = '',
+    this.referencePercentile = 0,
+    this.referenceStatus = 'unavailable',
+    this.referenceSource = '',
+    this.referenceQuality = '',
+    this.sensitizationLevel = '',
+    this.suggestionText = '',
   });
 
   Map<String, dynamic> toJson() => {
-    'startTime': startTime.millisecondsSinceEpoch,
-    'endTime': endTime.millisecondsSinceEpoch,
-    'count': count,
-    'maxForce': maxForce,
-    'minForce': minForce,
-    'avgForce': avgForce,
-    'maxTemp': maxTemp,
-    'minTemp': minTemp,
-    'avgTemp': avgTemp,
-    'filePath': filePath,
-  };
+        'sessionId': sessionId,
+        'startTime': startTime.millisecondsSinceEpoch,
+        'endTime': endTime.millisecondsSinceEpoch,
+        'count': count,
+        'bodyRegion': bodyRegion,
+        'symptomType': symptomType,
+        'algorithmVersion': algorithmVersion,
+        'probeAreaCm2': probeAreaCm2,
+        'maxForce': maxForce,
+        'minForce': minForce,
+        'avgForce': avgForce,
+        'maxTemp': maxTemp,
+        'minTemp': minTemp,
+        'avgTemp': avgTemp,
+        'filePath': filePath,
+        'pptValue': pptValue,
+        'pptPressure': pptPressure,
+        'pptTimeSec': pptTimeSec,
+        'pptTemp': pptTemp,
+        'peakForce': peakForce,
+        'riseRate': riseRate,
+        'slopeChangeScore': slopeChangeScore,
+        'peakPptRatio': peakPptRatio,
+        'curveQualityScore': curveQualityScore,
+        'curveValid': curveValid,
+        'curveInvalidReason': curveInvalidReason,
+        'referencePercentile': referencePercentile,
+        'referenceStatus': referenceStatus,
+        'referenceSource': referenceSource,
+        'referenceQuality': referenceQuality,
+        'sensitizationLevel': sensitizationLevel,
+        'suggestionText': suggestionText,
+      };
 
   factory MeasurementSummary.fromJson(Map<String, dynamic> json) {
     double _num(dynamic v) => (v is num) ? v.toDouble() : 0.0;
+    String _str(dynamic v, [String fallback = '']) =>
+        v == null ? fallback : '$v';
+    bool _bool(dynamic v) => v is bool ? v : '$v' == 'true';
 
     DateTime _dt(dynamic v) {
       // ✅ 兼容：int(毫秒) / num / String(ISO)
       if (v is int) return DateTime.fromMillisecondsSinceEpoch(v);
       if (v is num) return DateTime.fromMillisecondsSinceEpoch(v.toInt());
-      if (v is String) return DateTime.tryParse(v) ?? DateTime.fromMillisecondsSinceEpoch(0);
+      if (v is String)
+        return DateTime.tryParse(v) ?? DateTime.fromMillisecondsSinceEpoch(0);
       return DateTime.fromMillisecondsSinceEpoch(0);
     }
 
     return MeasurementSummary(
+      sessionId: _str(json['sessionId']),
       startTime: _dt(json['startTime']),
       endTime: _dt(json['endTime']),
-      count: (json['count'] is int) ? json['count'] as int : int.tryParse('${json['count']}') ?? 0,
-
+      count: (json['count'] is int)
+          ? json['count'] as int
+          : int.tryParse('${json['count']}') ?? 0,
+      bodyRegion: _str(json['bodyRegion'], 'lumbosacral'),
+      symptomType: _str(json['symptomType'], 'skipped'),
+      algorithmVersion: _str(json['algorithmVersion']),
+      probeAreaCm2:
+          _num(json['probeAreaCm2']) == 0 ? 1.0 : _num(json['probeAreaCm2']),
       maxForce: _num(json['maxForce']),
       minForce: _num(json['minForce']),
       avgForce: _num(json['avgForce']),
-
       maxTemp: _num(json['maxTemp']),
       minTemp: _num(json['minTemp']),
       avgTemp: _num(json['avgTemp']),
-
-      filePath: (json['filePath'] ?? '') as String,
+      filePath: _str(json['filePath']),
+      pptValue: _num(json['pptValue']),
+      pptPressure: _num(json['pptPressure']),
+      pptTimeSec: _num(json['pptTimeSec']),
+      pptTemp: _num(json['pptTemp']),
+      peakForce: _num(json['peakForce']),
+      riseRate: _num(json['riseRate']),
+      slopeChangeScore: _num(json['slopeChangeScore']),
+      peakPptRatio: _num(json['peakPptRatio']),
+      curveQualityScore: _num(json['curveQualityScore']),
+      curveValid: _bool(json['curveValid']),
+      curveInvalidReason: _str(json['curveInvalidReason']),
+      referencePercentile: _num(json['referencePercentile']),
+      referenceStatus: _str(json['referenceStatus'], 'unavailable'),
+      referenceSource: _str(json['referenceSource']),
+      referenceQuality: _str(json['referenceQuality']),
+      sensitizationLevel: _str(json['sensitizationLevel']),
+      suggestionText: _str(json['suggestionText']),
     );
   }
 
+  bool get hasPpt => pptValue > 0;
+
+  bool get hasSmartAssessment =>
+      hasPpt && curveValid && sensitizationLevel.trim().isNotEmpty;
+
+  String get bodyRegionLabel =>
+      BodyRegions.label(BodyRegions.fromId(bodyRegion));
+
+  String get symptomTypeLabel =>
+      SymptomTypes.label(SymptomTypes.fromId(symptomType));
+
+  String get sensitizationLabel =>
+      SensitizationLevels.label(sensitizationLevel);
+
   bool same_as(MeasurementSummary other) {
-    return startTime.millisecondsSinceEpoch == other.startTime.millisecondsSinceEpoch &&
-        endTime.millisecondsSinceEpoch == other.endTime.millisecondsSinceEpoch &&
+    if (sessionId.isNotEmpty && other.sessionId.isNotEmpty) {
+      return sessionId == other.sessionId;
+    }
+    return startTime.millisecondsSinceEpoch ==
+            other.startTime.millisecondsSinceEpoch &&
+        endTime.millisecondsSinceEpoch ==
+            other.endTime.millisecondsSinceEpoch &&
         count == other.count &&
         filePath == other.filePath;
   }
@@ -124,6 +237,7 @@ class PatientController extends GetxController {
 
   /// key: patients_zzh / patients_admin ...
   String get _patientsKey => 'patients_$username';
+
   /// 当前账号上一次选中的病人 phone
   String get _currentPatientKey => 'current_patient_$username';
 
@@ -194,7 +308,7 @@ class PatientController extends GetxController {
       if (savedPhone != null) {
         // 2️⃣ 尝试在 patients 里找到这个病人
         final matched = patients.firstWhereOrNull(
-              (p) => p.phone == savedPhone,
+          (p) => p.phone == savedPhone,
         );
 
         if (matched != null) {
@@ -211,7 +325,6 @@ class PatientController extends GetxController {
       currentPatient.value = null;
     }
   }
-
 
   /// 从本地加载“最近一次测量摘要”
   void _loadLastMeasurementsFromStorage() {
@@ -241,6 +354,7 @@ class PatientController extends GetxController {
     });
     _box.write(_lastMeasurementsKey, out);
   }
+
   /// ✅【新增】加载完整历史
   void _loadHistoryFromStorage() {
     final stored = _box.read<Map>(_historyKey);
@@ -253,7 +367,8 @@ class PatientController extends GetxController {
     stored.forEach((key, value) {
       try {
         final list = (value as List)
-            .map((e) => MeasurementSummary.fromJson(Map<String, dynamic>.from(e)))
+            .map((e) =>
+                MeasurementSummary.fromJson(Map<String, dynamic>.from(e)))
             .toList();
 
         // 按时间排序（老 -> 新）
@@ -298,7 +413,8 @@ class PatientController extends GetxController {
     _saveLastMeasurementsToStorage();
   }
 
-  Future<void> delete_measurement_record(String phone, MeasurementSummary summary) async {
+  Future<void> delete_measurement_record(
+      String phone, MeasurementSummary summary) async {
     // 1) 删 CSV（有些测量失败没有 CSV，要判断；并且删文件不影响删记录）
     final path = summary.filePath.trim();
     if (path.isNotEmpty) {
@@ -326,8 +442,10 @@ class PatientController extends GetxController {
     if (after == before) {
       // 兜底：如果 same_as 没匹配到，尝试更宽松的规则（防止老数据没 filePath）
       list.removeWhere((x) =>
-      x.startTime.millisecondsSinceEpoch == summary.startTime.millisecondsSinceEpoch &&
-          x.endTime.millisecondsSinceEpoch == summary.endTime.millisecondsSinceEpoch &&
+          x.startTime.millisecondsSinceEpoch ==
+              summary.startTime.millisecondsSinceEpoch &&
+          x.endTime.millisecondsSinceEpoch ==
+              summary.endTime.millisecondsSinceEpoch &&
           x.count == summary.count);
     }
 
@@ -381,7 +499,6 @@ class PatientController extends GetxController {
     // ✅ 记住这个账号当前选中的病人（用 phone 作为唯一标识）
     _box.write(_currentPatientKey, patient.phone);
   }
-
 
   /// 删除病人
   void deletePatient(Patient patient) {

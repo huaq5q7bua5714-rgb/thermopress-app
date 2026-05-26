@@ -27,8 +27,11 @@ class PatientDetailPage extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('$label:', style: const TextStyle(fontSize: 13, color: Colors.black54)),
-            Text(value, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+            Text('$label:',
+                style: const TextStyle(fontSize: 13, color: Colors.black54)),
+            Text(value,
+                style:
+                    const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
           ],
         ),
       );
@@ -58,7 +61,8 @@ class PatientDetailPage extends StatelessWidget {
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   child: Row(
                     children: [
                       CircleAvatar(
@@ -105,7 +109,8 @@ class PatientDetailPage extends StatelessWidget {
                         style: TextButton.styleFrom(
                           backgroundColor: const Color(0xFFE0EDFF),
                           foregroundColor: Colors.blue,
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 8),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20),
                           ),
@@ -136,80 +141,104 @@ class PatientDetailPage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 14),
                     child: latest == null
                         ? const Text(
-                      '目前没有测量数据 请完成一次测量',
-                      style: TextStyle(color: Colors.black54),
-                    )
+                            '目前没有测量数据 请完成一次测量',
+                            style: TextStyle(color: Colors.black54),
+                          )
                         : Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          '最近一次测量数据',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 16,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          '结束时间: ${fmt_dt(latest.endTime)}',
-                          style: const TextStyle(fontSize: 13, color: Colors.black54),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          '采样点数: ${latest.count}',
-                          style: const TextStyle(fontSize: 13, color: Colors.black54),
-                        ),
-                        const SizedBox(height: 12),
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                '最近一次测量数据',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                '结束时间: ${fmt_dt(latest.endTime)}',
+                                style: const TextStyle(
+                                    fontSize: 13, color: Colors.black54),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                '采样点数: ${latest.count}',
+                                style: const TextStyle(
+                                    fontSize: 13, color: Colors.black54),
+                              ),
+                              if (latest.hasPpt) ...[
+                                const SizedBox(height: 4),
+                                Text(
+                                  '${latest.bodyRegionLabel} · PPT ${latest.pptValue.toStringAsFixed(1)}N · ${latest.sensitizationLabel}',
+                                  style: const TextStyle(
+                                      fontSize: 13,
+                                      color: Colors.teal,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                              ],
+                              const SizedBox(height: 12),
 
-                        // ✅ 温度左 / 力右：字段齐全
-                        Row(
-                          children: [
-                            // Temperature (LEFT)
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                              // ✅ 温度左 / 力右：字段齐全
+                              Row(
                                 children: [
-                                  const Text(
-                                    '温度',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                      color: Colors.orange,
+                                  // Temperature (LEFT)
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const Text(
+                                          '温度',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w700,
+                                            color: Colors.orange,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 6),
+                                        statRow('最大值',
+                                            '${latest.maxTemp.toStringAsFixed(1)}°C'),
+                                        statRow('最小值',
+                                            '${latest.minTemp.toStringAsFixed(1)}°C'),
+                                        statRow('平均值',
+                                            '${latest.avgTemp.toStringAsFixed(1)}°C'),
+                                      ],
                                     ),
                                   ),
-                                  const SizedBox(height: 6),
-                                  statRow('最大值', '${latest.maxTemp.toStringAsFixed(1)}°C'),
-                                  statRow('最小值', '${latest.minTemp.toStringAsFixed(1)}°C'),
-                                  statRow('平均值', '${latest.avgTemp.toStringAsFixed(1)}°C'),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            // Pressure (RIGHT)
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text(
-                                    '压力',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                      color: Colors.blue,
+                                  const SizedBox(width: 16),
+                                  // Pressure (RIGHT)
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const Text(
+                                          '压力',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w700,
+                                            color: Colors.blue,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 6),
+                                        statRow('最大值',
+                                            '${latest.maxForce.toStringAsFixed(0)}N'),
+                                        statRow('最小值',
+                                            '${latest.minForce.toStringAsFixed(0)}N'),
+                                        statRow('平均值',
+                                            '${latest.avgForce.toStringAsFixed(0)}N'),
+                                        if (latest.hasPpt)
+                                          statRow('PPT',
+                                              '${latest.pptValue.toStringAsFixed(1)}N'),
+                                      ],
                                     ),
                                   ),
-                                  const SizedBox(height: 6),
-                                  statRow('最大值', '${latest.maxForce.toStringAsFixed(0)}N'),
-                                  statRow('最小值', '${latest.minForce.toStringAsFixed(0)}N'),
-                                  statRow('平均值', '${latest.avgForce.toStringAsFixed(0)}N'),
                                 ],
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                            ],
+                          ),
                   ),
                 );
               }),
@@ -258,8 +287,10 @@ class PatientDetailPage extends StatelessWidget {
                               ),
                             ),
                             subtitle: Text(
-                              '平均温度: ${s.avgTemp.toStringAsFixed(1)}°C, '
-                                  '平均压力: ${s.avgForce.toStringAsFixed(0)}N',
+                              s.hasPpt
+                                  ? '${s.bodyRegionLabel} · PPT ${s.pptValue.toStringAsFixed(1)}N · ${s.sensitizationLabel}'
+                                  : '平均温度: ${s.avgTemp.toStringAsFixed(1)}°C, '
+                                      '平均压力: ${s.avgForce.toStringAsFixed(0)}N',
                               style: const TextStyle(
                                 fontSize: 12,
                                 color: Colors.black54,
@@ -271,23 +302,28 @@ class PatientDetailPage extends StatelessWidget {
                               children: [
                                 TextButton(
                                   onPressed: () {
-                                    Get.to(() => MeasurementRecordDetailPage(summary: s));
+                                    Get.to(() => MeasurementRecordDetailPage(
+                                        summary: s));
                                   },
                                   style: TextButton.styleFrom(
                                     backgroundColor: const Color(0xFFE0EDFF),
                                     foregroundColor: Colors.blue,
-                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 16, vertical: 8),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(20),
                                     ),
                                   ),
                                   child: const Text(
                                     '查看',
-                                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                                    style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600),
                                   ),
                                 ),
                                 IconButton(
-                                  icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
+                                  icon: const Icon(Icons.delete_outline,
+                                      color: Colors.redAccent),
                                   tooltip: '删除',
                                   onPressed: () async {
                                     final ok = await Get.dialog<bool>(
@@ -295,18 +331,25 @@ class PatientDetailPage extends StatelessWidget {
                                         title: const Text('确定要删除测量数据吗?'),
                                         content: const Text(
                                           '本次测量数据将会被删除\n'
-                                              '如果存在对应的csv文件，会一起被删除',
+                                          '如果存在对应的csv文件，会一起被删除',
                                         ),
                                         actions: [
-                                          TextButton(onPressed: () => Get.back(result: false), child: const Text('取消')),
-                                          TextButton(onPressed: () => Get.back(result: true), child: const Text('删除')),
+                                          TextButton(
+                                              onPressed: () =>
+                                                  Get.back(result: false),
+                                              child: const Text('取消')),
+                                          TextButton(
+                                              onPressed: () =>
+                                                  Get.back(result: true),
+                                              child: const Text('删除')),
                                         ],
                                       ),
                                     );
 
                                     if (ok != true) return;
 
-                                    await pc.delete_measurement_record(patient.phone, s);
+                                    await pc.delete_measurement_record(
+                                        patient.phone, s);
 
                                     Get.snackbar(
                                       '删除',

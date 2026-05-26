@@ -1,0 +1,111 @@
+{
+  "version": "ppt_reference_v1",
+  "unit": "N/cm2",
+  "default_probe_area_cm2": 1.0,
+  "references": [
+    {
+      "region": "head_face",
+      "quality": "anatomical_approximation",
+      "source": "Tomschi et al. 2025 and internal anatomical mapping",
+      "note": "第一版解剖区域近似库，建议后续替换为本项目实测健康基线。",
+      "p5": 10,
+      "p10": 14,
+      "p25": 22,
+      "p50": 35,
+      "p75": 50,
+      "p90": 65,
+      "p95": 75
+    },
+    {
+      "region": "neck_shoulder",
+      "quality": "anatomical_approximation",
+      "source": "Tomschi et al. 2025 and internal anatomical mapping",
+      "note": "第一版解剖区域近似库，建议后续用颈肩部健康志愿者数据校准。",
+      "p5": 12,
+      "p10": 17,
+      "p25": 28,
+      "p50": 42,
+      "p75": 60,
+      "p90": 78,
+      "p95": 90
+    },
+    {
+      "region": "thoracic_back",
+      "quality": "anatomical_approximation",
+      "source": "Tomschi et al. 2025 and internal anatomical mapping",
+      "note": "第一版解剖区域近似库。",
+      "p5": 18,
+      "p10": 23,
+      "p25": 35,
+      "p50": 50,
+      "p75": 70,
+      "p90": 90,
+      "p95": 105
+    },
+    {
+      "region": "lumbosacral",
+      "quality": "anatomical_approximation",
+      "source": "Tomschi et al. 2025 and internal anatomical mapping",
+      "note": "第一版解剖区域近似库，可优先用项目已有腰背部对照测试继续校准。",
+      "p5": 20,
+      "p10": 25,
+      "p25": 38,
+      "p50": 55,
+      "p75": 75,
+      "p90": 95,
+      "p95": 110
+    },
+    {
+      "region": "abdomen",
+      "quality": "limited_acupoint_literature",
+      "source": "CPID acupoint PPT literature and internal anatomical mapping",
+      "note": "腹部参考值受穴位和病种影响较大，第一版仅作提示性参考。",
+      "p5": 8,
+      "p10": 12,
+      "p25": 20,
+      "p50": 32,
+      "p75": 45,
+      "p90": 60,
+      "p95": 70
+    },
+    {
+      "region": "upper_limb",
+      "quality": "anatomical_approximation",
+      "source": "Tomschi et al. 2025 and internal anatomical mapping",
+      "note": "第一版解剖区域近似库。",
+      "p5": 12,
+      "p10": 16,
+      "p25": 25,
+      "p50": 38,
+      "p75": 55,
+      "p90": 70,
+      "p95": 82
+    },
+    {
+      "region": "knee",
+      "quality": "direct_joint_reference",
+      "source": "Tomschi et al. 2025; knee OA PPT ranges used as low-threshold anchor",
+      "note": "膝周区域第一版优先参考膝关节相关PPT分布。",
+      "p5": 28,
+      "p10": 35,
+      "p25": 50,
+      "p50": 70,
+      "p75": 92,
+      "p90": 112,
+      "p95": 125
+    },
+    {
+      "region": "lower_limb_distal",
+      "quality": "limited_acupoint_literature",
+      "source": "Lower-limb acupoint PPT literature and internal anatomical mapping",
+      "note": "下肢远端穴位差异较大，第一版用于趋势和粗分层。",
+      "p5": 15,
+      "p10": 20,
+      "p25": 32,
+      "p50": 48,
+      "p75": 68,
+      "p90": 85,
+      "p95": 100
+    }
+  ]
+}

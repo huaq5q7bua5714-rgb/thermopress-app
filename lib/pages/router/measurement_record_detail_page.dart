@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'dart:math';
 import 'package:poct_app/pages/home/patient_controller.dart';
 
 class MeasurementRecordDetailPage extends StatefulWidget {
@@ -17,7 +16,8 @@ class MeasurementRecordDetailPage extends StatefulWidget {
       _MeasurementRecordDetailPageState();
 }
 
-class _MeasurementRecordDetailPageState extends State<MeasurementRecordDetailPage> {
+class _MeasurementRecordDetailPageState
+    extends State<MeasurementRecordDetailPage> {
   bool _loading = true;
   String? _error;
 
@@ -45,7 +45,6 @@ class _MeasurementRecordDetailPageState extends State<MeasurementRecordDetailPag
   double _scaleStartForceFocalX = 0.0;
 
   static const double _yPad = 2.0;
-
 
   String two(int v) => v.toString().padLeft(2, '0');
   String fmtDt(DateTime dt) =>
@@ -100,8 +99,9 @@ class _MeasurementRecordDetailPageState extends State<MeasurementRecordDetailPag
 
         if (dt == null || te == null || fo == null) continue;
 
-        start ??= dt;
-        final sec = dt.difference(start!).inMilliseconds / 1000.0;
+        final startTime = start ?? dt;
+        start = startTime;
+        final sec = dt.difference(startTime).inMilliseconds / 1000.0;
 
         time.add(dt);
         x.add(sec);
@@ -145,6 +145,7 @@ class _MeasurementRecordDetailPageState extends State<MeasurementRecordDetailPag
       });
     }
   }
+
   // Y轴刻度间距（约5~7个刻度）
   double _nice_interval(double range) {
     if (range <= 10) return 3;
@@ -219,17 +220,21 @@ class _MeasurementRecordDetailPageState extends State<MeasurementRecordDetailPag
     if (chartWidth <= 0) return;
 
     final startWindow = isTemp ? _scaleStartTempWindow : _scaleStartForceWindow;
-    final startViewMin = isTemp ? _scaleStartTempViewMin : _scaleStartForceViewMin;
+    final startViewMin =
+        isTemp ? _scaleStartTempViewMin : _scaleStartForceViewMin;
     final startFocalX = isTemp ? _scaleStartTempFocalX : _scaleStartForceFocalX;
 
     double newMin, newMax, newWindow;
 
     if (details.pointerCount >= 2) {
       // 双指捏合：缩放X轴，焦点位置对应数据点保持不变
-      final hScale = details.horizontalScale > 0 ? details.horizontalScale : 1.0;
+      final hScale =
+          details.horizontalScale > 0 ? details.horizontalScale : 1.0;
       newWindow = (startWindow / hScale).clamp(0.5, span);
-      final focalDataX = startViewMin + (startFocalX / chartWidth) * startWindow;
-      newMin = focalDataX - (details.localFocalPoint.dx / chartWidth) * newWindow;
+      final focalDataX =
+          startViewMin + (startFocalX / chartWidth) * startWindow;
+      newMin =
+          focalDataX - (details.localFocalPoint.dx / chartWidth) * newWindow;
     } else {
       // 单指：从手势起点计算绝对偏移量，避免逐帧累积误差
       newWindow = startWindow;
@@ -238,8 +243,14 @@ class _MeasurementRecordDetailPageState extends State<MeasurementRecordDetailPag
     }
 
     newMax = newMin + newWindow;
-    if (newMin < minAll) { newMin = minAll; newMax = minAll + newWindow; }
-    if (newMax > maxAll) { newMax = maxAll; newMin = (maxAll - newWindow).clamp(minAll, maxAll); }
+    if (newMin < minAll) {
+      newMin = minAll;
+      newMax = minAll + newWindow;
+    }
+    if (newMax > maxAll) {
+      newMax = maxAll;
+      newMin = (maxAll - newWindow).clamp(minAll, maxAll);
+    }
 
     setState(() {
       if (isTemp) {
@@ -280,14 +291,25 @@ class _MeasurementRecordDetailPageState extends State<MeasurementRecordDetailPag
     required double viewMinX,
     required double viewMaxX,
   }) {
+    final bars = <LineChartBarData>[_line(y, color)];
+    if (unitSuffix == 'N' && widget.summary.hasPpt) {
+      bars.add(
+        LineChartBarData(
+          spots: [FlSpot(widget.summary.pptTimeSec, widget.summary.pptValue)],
+          isCurved: false,
+          barWidth: 0,
+          color: Colors.redAccent,
+          dotData: const FlDotData(show: true),
+        ),
+      );
+    }
+
     return LineChartData(
       minX: viewMinX,
       maxX: viewMaxX,
       minY: minY,
       maxY: maxY,
-
       clipData: const FlClipData.all(),
-
       gridData: FlGridData(
         show: true,
         drawVerticalLine: true,
@@ -303,14 +325,12 @@ class _MeasurementRecordDetailPageState extends State<MeasurementRecordDetailPag
           dashArray: [6, 6],
         ),
       ),
-
       borderData: FlBorderData(
         show: true,
         border: const Border.fromBorderSide(
           BorderSide(color: Color(0xFFBDBDBD), width: 1),
         ),
       ),
-
       titlesData: FlTitlesData(
         topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
         rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
@@ -337,7 +357,8 @@ class _MeasurementRecordDetailPageState extends State<MeasurementRecordDetailPag
             interval: _nice_x_interval(viewMaxX - viewMinX),
             getTitlesWidget: (value, meta) {
               final step = _nice_x_interval(viewMaxX - viewMinX);
-              if ((value % step).abs() > step * 0.05) return const SizedBox.shrink();
+              if ((value % step).abs() > step * 0.05)
+                return const SizedBox.shrink();
               final label = step < 1
                   ? '${value.toStringAsFixed(1)}s'
                   : '${value.round()}s';
@@ -346,9 +367,7 @@ class _MeasurementRecordDetailPageState extends State<MeasurementRecordDetailPag
           ),
         ),
       ),
-
-      lineBarsData: [_line(y, color)],
-
+      lineBarsData: bars,
       lineTouchData: LineTouchData(
         enabled: true,
         handleBuiltInTouches: true,
@@ -419,8 +438,11 @@ class _MeasurementRecordDetailPageState extends State<MeasurementRecordDetailPag
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(fontSize: 13, color: Colors.black54)),
-          Text(value, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+          Text(label,
+              style: const TextStyle(fontSize: 13, color: Colors.black54)),
+          Text(value,
+              style:
+                  const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
         ],
       ),
     );
@@ -443,91 +465,131 @@ class _MeasurementRecordDetailPageState extends State<MeasurementRecordDetailPag
         child: _loading
             ? const Center(child: CircularProgressIndicator())
             : (_error != null)
-            ? Center(
-          child: Text(
-            _error!,
-            style: const TextStyle(color: Colors.black54),
-            textAlign: TextAlign.center,
-          ),
-        )
-            : ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            // ✅ Summary card：温度先写，力后写；字段齐全
-            Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(14),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('开始时间: ${fmtDt(widget.summary.startTime)}',
-                        style: const TextStyle(fontSize: 13, color: Colors.black54)),
-                    const SizedBox(height: 4),
-                    Text('结束时间: ${fmtDt(widget.summary.endTime)}',
-                        style: const TextStyle(fontSize: 13, color: Colors.black54)),
-                    const SizedBox(height: 8),
-                    Text('采样点数: ${widget.summary.count}',
-                        style: const TextStyle(fontSize: 13, color: Colors.black54)),
-
-                    const SizedBox(height: 12),
-                    const Text('温度',
-                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Colors.orange)),
-                    const SizedBox(height: 6),
-                    _stat_line('最大值', '${widget.summary.maxTemp.toStringAsFixed(1)} °C'),
-                    _stat_line('最小值', '${widget.summary.minTemp.toStringAsFixed(1)} °C'),
-                    _stat_line('平均值', '${widget.summary.avgTemp.toStringAsFixed(1)} °C'),
-
-                    const SizedBox(height: 12),
-                    const Text('压力',
-                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Colors.blue)),
-                    const SizedBox(height: 6),
-                    _stat_line('最大值', '${widget.summary.maxForce.toStringAsFixed(1)} N'),
-                    _stat_line('最小值', '${widget.summary.minForce.toStringAsFixed(1)} N'),
-                    _stat_line('平均值', '${widget.summary.avgForce.toStringAsFixed(1)} N'),
-
-                    const SizedBox(height: 10),
-                    Text(
-                      path.isEmpty ? 'CSV文件: 无' : 'CSV文件: $path',
-                      style: const TextStyle(fontSize: 12, color: Colors.black45),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+                ? Center(
+                    child: Text(
+                      _error!,
+                      style: const TextStyle(color: Colors.black54),
+                      textAlign: TextAlign.center,
                     ),
-                  ],
-                ),
-              ),
-            ),
+                  )
+                : ListView(
+                    padding: const EdgeInsets.all(16),
+                    children: [
+                      // ✅ Summary card：温度先写，力后写；字段齐全
+                      Card(
+                        elevation: 4,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(14),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('开始时间: ${fmtDt(widget.summary.startTime)}',
+                                  style: const TextStyle(
+                                      fontSize: 13, color: Colors.black54)),
+                              const SizedBox(height: 4),
+                              Text('结束时间: ${fmtDt(widget.summary.endTime)}',
+                                  style: const TextStyle(
+                                      fontSize: 13, color: Colors.black54)),
+                              const SizedBox(height: 8),
+                              Text('采样点数: ${widget.summary.count}',
+                                  style: const TextStyle(
+                                      fontSize: 13, color: Colors.black54)),
+                              if (widget.summary.hasPpt) ...[
+                                const SizedBox(height: 12),
+                                const Text('智能评估',
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.teal)),
+                                const SizedBox(height: 6),
+                                _stat_line(
+                                    '身体区域', widget.summary.bodyRegionLabel),
+                                _stat_line(
+                                    '主诉类型', widget.summary.symptomTypeLabel),
+                                _stat_line('PPT',
+                                    '${widget.summary.pptValue.toStringAsFixed(1)} N'),
+                                _stat_line('标准化压力',
+                                    '${widget.summary.pptPressure.toStringAsFixed(1)} N/cm²'),
+                                _stat_line(
+                                  '参考百分位',
+                                  widget.summary.referenceStatus == 'ok'
+                                      ? '第 ${widget.summary.referencePercentile.toStringAsFixed(0)} 百分位'
+                                      : '暂无参考',
+                                ),
+                                _stat_line(
+                                    '敏化提示', widget.summary.sensitizationLabel),
+                                _stat_line('曲线质量',
+                                    '${widget.summary.curveQualityScore.toStringAsFixed(0)} / 100'),
+                              ],
+                              const SizedBox(height: 12),
+                              const Text('温度',
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.orange)),
+                              const SizedBox(height: 6),
+                              _stat_line('最大值',
+                                  '${widget.summary.maxTemp.toStringAsFixed(1)} °C'),
+                              _stat_line('最小值',
+                                  '${widget.summary.minTemp.toStringAsFixed(1)} °C'),
+                              _stat_line('平均值',
+                                  '${widget.summary.avgTemp.toStringAsFixed(1)} °C'),
+                              const SizedBox(height: 12),
+                              const Text('压力',
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.blue)),
+                              const SizedBox(height: 6),
+                              _stat_line('最大值',
+                                  '${widget.summary.maxForce.toStringAsFixed(1)} N'),
+                              _stat_line('最小值',
+                                  '${widget.summary.minForce.toStringAsFixed(1)} N'),
+                              _stat_line('平均值',
+                                  '${widget.summary.avgForce.toStringAsFixed(1)} N'),
+                              const SizedBox(height: 10),
+                              Text(
+                                path.isEmpty ? 'CSV文件: 无' : 'CSV文件: $path',
+                                style: const TextStyle(
+                                    fontSize: 12, color: Colors.black45),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
 
-            const SizedBox(height: 14),
+                      const SizedBox(height: 14),
 
-            // 温度图
-            _buildDetailChartCard(
-              isTemp: true,
-              title: '温度',
-              y: _temp,
-              unitSuffix: '°C',
-              color: const Color(0xFFF4A460),
-              viewMinX: _tempViewMinX,
-              viewMaxX: _tempViewMaxX,
-            ),
+                      // 温度图
+                      _buildDetailChartCard(
+                        isTemp: true,
+                        title: '温度',
+                        y: _temp,
+                        unitSuffix: '°C',
+                        color: const Color(0xFFF4A460),
+                        viewMinX: _tempViewMinX,
+                        viewMaxX: _tempViewMaxX,
+                      ),
 
-            const SizedBox(height: 14),
+                      const SizedBox(height: 14),
 
-            // 压力图
-            _buildDetailChartCard(
-              isTemp: false,
-              title: '压力',
-              y: _force,
-              unitSuffix: 'N',
-              color: const Color(0xFF4A90E2),
-              viewMinX: _forceViewMinX,
-              viewMaxX: _forceViewMaxX,
-            ),
-          ],
-        ),
+                      // 压力图
+                      _buildDetailChartCard(
+                        isTemp: false,
+                        title: '压力',
+                        y: _force,
+                        unitSuffix: 'N',
+                        color: const Color(0xFF4A90E2),
+                        viewMinX: _forceViewMinX,
+                        viewMaxX: _forceViewMaxX,
+                      ),
+                    ],
+                  ),
       ),
     );
   }
