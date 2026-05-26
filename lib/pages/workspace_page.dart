@@ -41,11 +41,12 @@ class _WorkspacePageState extends State<WorkspacePage> {
           elevation: 0,
           backgroundColor: Colors.transparent,
           foregroundColor: Colors.black87,
+          centerTitle: false,
+          titleSpacing: 16,
           title: Obx(() {
             final auth = Get.find<AuthController>();
             final doctor = auth.currentDoctor.value;
-            final title_text =
-            doctor != null ? '${doctor.displayName}' : '患者';
+            final title_text = doctor != null ? '${doctor.displayName}' : '患者';
             return Text(
               title_text,
               style: const TextStyle(
@@ -67,7 +68,7 @@ class _WorkspacePageState extends State<WorkspacePage> {
                   backgroundColor: Colors.blue,
                   foregroundColor: Colors.white,
                   padding:
-                  const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+                      const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
                   ),
@@ -128,9 +129,7 @@ class _WorkspacePageState extends State<WorkspacePage> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          connected
-                              ? info.platformName
-                              : '无设备连接',
+                          connected ? info.platformName : '无设备连接',
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
@@ -170,17 +169,17 @@ class _WorkspacePageState extends State<WorkspacePage> {
                         suffixIcon: q.isEmpty
                             ? null
                             : IconButton(
-                          tooltip: 'Clear',
-                          icon: const Icon(Icons.close, size: 18),
-                          onPressed: () {
-                            patient_controller.clearSearch();
-                            _search_controller.clear();
-                            FocusScope.of(context).unfocus();
-                          },
-                        ),
+                                tooltip: 'Clear',
+                                icon: const Icon(Icons.close, size: 18),
+                                onPressed: () {
+                                  patient_controller.clearSearch();
+                                  _search_controller.clear();
+                                  FocusScope.of(context).unfocus();
+                                },
+                              ),
                         border: InputBorder.none,
                         contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 12),
+                            const EdgeInsets.symmetric(horizontal: 12),
                       ),
                     );
                   }),
@@ -242,9 +241,7 @@ class _PatientsList extends StatelessWidget {
 
       if (list.isEmpty) {
         final q = patientController.searchQuery.value.trim();
-        final show_text = q.isEmpty
-            ? '无患者 请点击 + 添加患者'
-            : 'No results for "$q"';
+        final show_text = q.isEmpty ? '无患者 请点击 + 添加患者' : 'No results for "$q"';
 
         return Center(
           child: Text(
@@ -269,7 +266,7 @@ class _PatientsList extends StatelessWidget {
                 onTap: () => onTapPatient(p),
                 child: Padding(
                   padding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   child: Row(
                     children: [
                       // 左侧 文字信息
@@ -312,8 +309,7 @@ class _PatientsList extends StatelessWidget {
                         onPressed: () {
                           Get.defaultDialog(
                             title: '删除患者',
-                            middleText:
-                            '你确定想要删除患者${p.name}吗?',
+                            middleText: '你确定想要删除患者${p.name}吗?',
                             textCancel: '取消',
                             textConfirm: '删除',
                             confirmTextColor: Colors.white,
