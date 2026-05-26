@@ -523,15 +523,23 @@ class HomeController extends GetxController with BleCallback {
         final appFile = File('${appDir.path}/$fileName');
         await appFile.writeAsString(csvText, flush: true);
         Get.log('✅ Saved (app dir): ${appFile.path}');
+        savedFile = appFile;
 
         // ===== 3) 再保存到 Download/ThermoPressData（用户可见）=====
-        // 目标目录：/storage/emulated/0/Download/ThermoPressData
-        final downloadDir =
-            Directory('/storage/emulated/0/Download/ThermoPressData');
-        if (!await downloadDir.exists()) {
-          await downloadDir.create(recursive: true);
+        // Android 10+ 对公共目录直写更严格，失败时保留 appFile 作为权威路径。
+        try {
+          final downloadDir =
+              Directory('/storage/emulated/0/Download/ThermoPressData');
+          if (!await downloadDir.exists()) {
+            await downloadDir.create(recursive: true);
+          }
+          final publicFile = File('${downloadDir.path}/$fileName');
+          await publicFile.writeAsString(csvText, flush: true);
+          savedFile = publicFile;
+          Get.log('✅ Saved (public downloads): ${publicFile.path}');
+        } catch (e) {
+          Get.log('⚠ Public Download save skipped: $e');
         }
-        savedFile = File('${downloadDir.path}/$fileName');
       } else {
         final documentsDir = await getApplicationDocumentsDirectory();
         final dataDir = Directory('${documentsDir.path}/ThermoPressData');

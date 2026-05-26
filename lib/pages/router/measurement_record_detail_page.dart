@@ -160,6 +160,17 @@ class _MeasurementRecordDetailPageState
       File('${documentsDir.path}/$fileName'),
     ];
 
+    if (Platform.isAndroid) {
+      final externalDir = await getExternalStorageDirectory();
+      if (externalDir != null) {
+        candidates.add(File('${externalDir.path}/$fileName'));
+        candidates.add(File('${externalDir.path}/ThermoPressData/$fileName'));
+      }
+      candidates.add(
+        File('/storage/emulated/0/Download/ThermoPressData/$fileName'),
+      );
+    }
+
     for (final file in candidates) {
       if (await file.exists()) return file;
     }
