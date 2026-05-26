@@ -33,9 +33,13 @@ class _MeasurementPageState extends State<MeasurementPage> {
   double _scaleStartForceFocalX = 0.0;
 
   // ===================== Live Status 悬浮窗位置 =====================
+  static const double _floatMargin = 8;
+  static const double _floatMaxWidth = 340;
+  static const double _floatEstimatedHeight = 190;
+
+  final GlobalKey _liveStatsKey = GlobalKey();
   double _floatLeft = 12;
   double _floatTop = 12;
-
 
   @override
   void initState() {
@@ -52,7 +56,8 @@ class _MeasurementPageState extends State<MeasurementPage> {
       if (!recording && controller.points.isNotEmpty) {
         final pts = controller.points;
         final baseEpoch = controller.recordingStartEpochMs.value;
-        final lastX = (pts.last.time.millisecondsSinceEpoch - baseEpoch) / 1000.0;
+        final lastX =
+            (pts.last.time.millisecondsSinceEpoch - baseEpoch) / 1000.0;
 
         setState(() {
           _tempViewMinX = max(0.0, lastX - _tempWindow);
@@ -63,6 +68,7 @@ class _MeasurementPageState extends State<MeasurementPage> {
       }
     });
   }
+
   @override
   void dispose() {
     _recordingWorker.dispose();
@@ -74,22 +80,31 @@ class _MeasurementPageState extends State<MeasurementPage> {
     _floatTop = 16;
   }
 
-  void _clampFloatingPos(BuildContext context) {
-    final size = MediaQuery.of(context).size;
+  Size _liveStatsSize(Size bounds) {
+    final renderBox =
+        _liveStatsKey.currentContext?.findRenderObject() as RenderBox?;
+    final measuredSize = renderBox?.hasSize == true ? renderBox!.size : null;
 
-    // 这里的宽高给一个大概值即可（卡片本身会自适应）
-    // 如果你后面想更精准，可以用 LayoutBuilder 或 GlobalKey 去量实际尺寸
-    const double estW = 320;
-    const double estH = 170;
-
-    final minLeft = 8.0;
-    final minTop = 8.0;
-    final maxLeft = (size.width - estW - 8).clamp(8.0, size.width);
-    final maxTop = (size.height - estH - 8).clamp(8.0, size.height);
-
-    _floatLeft = _floatLeft.clamp(minLeft, maxLeft);
-    _floatTop = _floatTop.clamp(minTop, maxTop);
+    final fallbackWidth =
+        min(_floatMaxWidth, max(0.0, bounds.width - _floatMargin * 2));
+    return Size(
+      measuredSize?.width ?? fallbackWidth,
+      measuredSize?.height ?? _floatEstimatedHeight,
+    );
   }
+
+  void _clampFloatingPos(Size bounds) {
+    final cardSize = _liveStatsSize(bounds);
+
+    final maxLeft =
+        max(_floatMargin, bounds.width - cardSize.width - _floatMargin);
+    final maxTop =
+        max(_floatMargin, bounds.height - cardSize.height - _floatMargin);
+
+    _floatLeft = _floatLeft.clamp(_floatMargin, maxLeft);
+    _floatTop = _floatTop.clamp(_floatMargin, maxTop);
+  }
+
   // ===================== 捏合/平移手势（独立温度/力） =====================
   void _onScaleStart(ScaleStartDetails details, bool isTemp) {
     if (isTemp) {
@@ -109,11 +124,13 @@ class _MeasurementPageState extends State<MeasurementPage> {
     if (pts.isEmpty) return;
 
     final baseEpochMs = controller.recordingStartEpochMs.value;
-    final maxAll = (pts.last.time.millisecondsSinceEpoch - baseEpochMs) / 1000.0;
+    final maxAll =
+        (pts.last.time.millisecondsSinceEpoch - baseEpochMs) / 1000.0;
     if (maxAll <= 0) return;
 
     final startWindow = isTemp ? _scaleStartTempWindow : _scaleStartForceWindow;
-    final startViewMin = isTemp ? _scaleStartTempViewMin : _scaleStartForceViewMin;
+    final startViewMin =
+        isTemp ? _scaleStartTempViewMin : _scaleStartForceViewMin;
     final startFocalX = isTemp ? _scaleStartTempFocalX : _scaleStartForceFocalX;
 
     // 图表数据区宽度（近似：屏幕宽 - 外边距 - 内边距 - Y轴标签）
@@ -125,11 +142,18 @@ class _MeasurementPageState extends State<MeasurementPage> {
 
     // 保持手指焦点下的数据坐标不变
     final focalDataX = startViewMin + (startFocalX / chartWidth) * startWindow;
-    double newMin = focalDataX - (details.localFocalPoint.dx / chartWidth) * newWindow;
+    double newMin =
+        focalDataX - (details.localFocalPoint.dx / chartWidth) * newWindow;
     double newMax = newMin + newWindow;
 
-    if (newMin < 0) { newMin = 0; newMax = newWindow; }
-    if (newMax > maxAll) { newMax = maxAll; newMin = (maxAll - newWindow).clamp(0.0, maxAll); }
+    if (newMin < 0) {
+      newMin = 0;
+      newMax = newWindow;
+    }
+    if (newMax > maxAll) {
+      newMax = maxAll;
+      newMin = (maxAll - newWindow).clamp(0.0, maxAll);
+    }
 
     setState(() {
       if (isTemp) {
@@ -165,7 +189,8 @@ class _MeasurementPageState extends State<MeasurementPage> {
 
     double minY, maxY;
     if (spots.isEmpty) {
-      minY = 0; maxY = 1;
+      minY = 0;
+      maxY = 1;
     } else {
       const pad = 2.0;
       final vals = spots.map((s) => s.y);
@@ -188,7 +213,8 @@ class _MeasurementPageState extends State<MeasurementPage> {
         lineTouchData: LineTouchData(
           handleBuiltInTouches: true,
           touchTooltipData: LineTouchTooltipData(
-            tooltipPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+            tooltipPadding:
+                const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
             tooltipRoundedRadius: 8,
             getTooltipItems: (touchedSpots) {
               if (touchedSpots.isEmpty) return [];
@@ -196,7 +222,7 @@ class _MeasurementPageState extends State<MeasurementPage> {
               final spot = touchedSpots.first;
 
               final valueLine = '${spot.y.toStringAsFixed(1)} $unit';
-              final timeLine  = '${spot.x.toStringAsFixed(1)} s';
+              final timeLine = '${spot.x.toStringAsFixed(1)} s';
 
               return [
                 LineTooltipItem(
@@ -253,7 +279,6 @@ class _MeasurementPageState extends State<MeasurementPage> {
       ),
     );
   }
-
 
   // ===================== 图表卡片（捏合缩放 + 单指平移） =====================
   Widget _buildChartCard({
@@ -418,7 +443,7 @@ class _MeasurementPageState extends State<MeasurementPage> {
                   backgroundColor: recording ? Colors.redAccent : Colors.blue,
                   foregroundColor: Colors.white,
                   padding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
                   ),
@@ -461,9 +486,7 @@ class _MeasurementPageState extends State<MeasurementPage> {
 
               maxTemp = pts.map((e) => e.temperature).reduce(max);
               minTemp = pts.map((e) => e.temperature).reduce(min);
-              avgTemp = pts
-                  .map((e) => e.temperature)
-                  .reduce((a, b) => a + b) /
+              avgTemp = pts.map((e) => e.temperature).reduce((a, b) => a + b) /
                   pts.length;
             }
 
@@ -478,90 +501,116 @@ class _MeasurementPageState extends State<MeasurementPage> {
 
             final baseEpochMs = controller.recordingStartEpochMs.value;
 
-            final tempSpots = pts.map((p) => FlSpot(
-              (p.time.millisecondsSinceEpoch - baseEpochMs) / 1000.0,
-              p.temperature,
-            )).toList();
+            final tempSpots = pts
+                .map((p) => FlSpot(
+                      (p.time.millisecondsSinceEpoch - baseEpochMs) / 1000.0,
+                      p.temperature,
+                    ))
+                .toList();
 
-            final forceSpots = pts.map((p) => FlSpot(
-              (p.time.millisecondsSinceEpoch - baseEpochMs) / 1000.0,
-              p.force,
-            )).toList();
+            final forceSpots = pts
+                .map((p) => FlSpot(
+                      (p.time.millisecondsSinceEpoch - baseEpochMs) / 1000.0,
+                      p.force,
+                    ))
+                .toList();
 
-            return Stack(
-              children: [
-                // ===== 背景：曲线页面（仍可滚动）=====
-                SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // ===== Temperature chart =====
-                      _buildChartCard(
-                        spots: tempSpots,
-                        unit: '°C',
-                        color: Colors.orange,
-                        isTemp: true,
-                        recording: controller.isRecording.value,
-                      ),
+            return LayoutBuilder(
+              builder: (context, constraints) {
+                final stackSize = Size(
+                  constraints.maxWidth.isFinite
+                      ? constraints.maxWidth
+                      : MediaQuery.of(context).size.width,
+                  constraints.maxHeight.isFinite
+                      ? constraints.maxHeight
+                      : MediaQuery.of(context).size.height,
+                );
 
-                      const SizedBox(height: 16),
-
-                      // ===== Force chart =====
-                      _buildChartCard(
-                        spots: forceSpots,
-                        unit: 'N',
-                        color: Colors.blue,
-                        isTemp: false,
-                        recording: controller.isRecording.value,
-                      ),
-
-                      // ✅ 原来的 Live Status 不再放在滚动里了（避免重复）
-                      // ✅ 给底部留点空间，避免悬浮窗挡住内容
-                      const SizedBox(height: 140),
-                    ],
-                  ),
-                ),
-
-                // ===== 前景：Live Status 悬浮窗（Start 出现，Stop 自动隐藏）=====
-                Obx(() {
-                  if (!controller.isRecording.value) {
-                    return const SizedBox.shrink();
-                  }
-
-                  return Positioned(
-                    left: _floatLeft,
-                    top: _floatTop,
-                    child: GestureDetector(
-                      onPanUpdate: (d) {
-                        setState(() {
-                          _floatLeft += d.delta.dx;
-                          _floatTop += d.delta.dy;
-                          _clampFloatingPos(context);
-                        });
-                      },
-                      child: Material(
-                        color: Colors.transparent,
-                        elevation: 8,
-                        borderRadius: BorderRadius.circular(16),
-                        child: ConstrainedBox(
-                          constraints: const BoxConstraints(maxWidth: 340),
-                          child: _buildLiveStatsCard(
-                            hasData: hasData,
-                            currentForce: currentForce,
-                            maxForce: maxForce,
-                            minForce: minForce,
-                            avgForce: avgForce,
-                            currentTemp: currentTemp,
-                            maxTemp: maxTemp,
-                            minTemp: minTemp,
-                            avgTemp: avgTemp,
+                return Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    // ===== 背景：曲线页面（仍可滚动）=====
+                    SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // ===== Temperature chart =====
+                          _buildChartCard(
+                            spots: tempSpots,
+                            unit: '°C',
+                            color: Colors.orange,
+                            isTemp: true,
+                            recording: controller.isRecording.value,
                           ),
-                        ),
+
+                          const SizedBox(height: 16),
+
+                          // ===== Force chart =====
+                          _buildChartCard(
+                            spots: forceSpots,
+                            unit: 'N',
+                            color: Colors.blue,
+                            isTemp: false,
+                            recording: controller.isRecording.value,
+                          ),
+
+                          // ✅ 原来的 Live Status 不再放在滚动里了（避免重复）
+                          // ✅ 给底部留点空间，避免悬浮窗挡住内容
+                          const SizedBox(height: 140),
+                        ],
                       ),
                     ),
-                  );
-                }),
-              ],
+
+                    // ===== 前景：Live Status 悬浮窗（Start 出现，Stop 自动隐藏）=====
+                    Obx(() {
+                      if (!controller.isRecording.value) {
+                        return const SizedBox.shrink();
+                      }
+
+                      return Positioned(
+                        left: _floatLeft,
+                        top: _floatTop,
+                        child: GestureDetector(
+                          onPanUpdate: (d) {
+                            setState(() {
+                              _floatLeft += d.delta.dx;
+                              _floatTop += d.delta.dy;
+                              _clampFloatingPos(stackSize);
+                            });
+                          },
+                          onPanEnd: (_) {
+                            setState(() {
+                              _clampFloatingPos(stackSize);
+                            });
+                          },
+                          child: Material(
+                            key: _liveStatsKey,
+                            color: Colors.transparent,
+                            elevation: 8,
+                            borderRadius: BorderRadius.circular(16),
+                            child: ConstrainedBox(
+                              constraints: const BoxConstraints(
+                                maxWidth: _floatMaxWidth,
+                              ),
+                              child: _buildLiveStatsCard(
+                                hasData: hasData,
+                                currentForce: currentForce,
+                                maxForce: maxForce,
+                                minForce: minForce,
+                                avgForce: avgForce,
+                                currentTemp: currentTemp,
+                                maxTemp: maxTemp,
+                                minTemp: minTemp,
+                                avgTemp: avgTemp,
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
+                  ],
+                );
+              },
             );
           }),
         ),
