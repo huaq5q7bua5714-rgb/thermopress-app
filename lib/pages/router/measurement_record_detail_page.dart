@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:poct_app/pages/home/patient_controller.dart';
 
 class MeasurementRecordDetailPage extends StatefulWidget {
@@ -63,19 +64,14 @@ class _MeasurementRecordDetailPageState
     });
 
     try {
-      final path = widget.summary.filePath;
-      if (path.isEmpty) {
-        throw 'No file path saved for this record.';
-      }
-
-      final file = File(path);
-      if (!await file.exists()) {
-        throw 'CSV file not found.';
+      final file = await _resolveCsvFile(widget.summary.filePath);
+      if (file == null) {
+        throw '原始CSV文件未找到，仅显示本次测量摘要。';
       }
 
       final lines = await file.readAsLines();
       if (lines.length <= 1) {
-        throw 'CSV is empty.';
+        throw 'CSV为空，仅显示本次测量摘要。';
       }
 
       final x = <double>[];
@@ -110,7 +106,7 @@ class _MeasurementRecordDetailPageState
       }
 
       if (x.isEmpty) {
-        throw 'No valid samples parsed from CSV.';
+        throw 'CSV中没有有效采样点，仅显示本次测量摘要。';
       }
 
       _x = x;
@@ -144,6 +140,37 @@ class _MeasurementRecordDetailPageState
         _error = '$e';
       });
     }
+  }
+
+  Future<File?> _resolveCsvFile(String savedPath) async {
+    final path = savedPath.trim();
+    if (path.isEmpty) return null;
+
+    final directFile = File(path);
+    if (await directFile.exists()) return directFile;
+
+    // iOS sandbox paths can change after reinstall/update. Keep old records
+    // usable by resolving the saved file name in the current Documents folder.
+    final fileName = _fileNameFromPath(path);
+    if (fileName.isEmpty) return null;
+
+    final documentsDir = await getApplicationDocumentsDirectory();
+    final candidates = <File>[
+      File('${documentsDir.path}/ThermoPressData/$fileName'),
+      File('${documentsDir.path}/$fileName'),
+    ];
+
+    for (final file in candidates) {
+      if (await file.exists()) return file;
+    }
+
+    return null;
+  }
+
+  String _fileNameFromPath(String path) {
+    final normalized = path.replaceAll('\\', '/');
+    final parts = normalized.split('/');
+    return parts.isEmpty ? '' : parts.last.trim();
   }
 
   // Y轴刻度间距（约5~7个刻度）
@@ -451,6 +478,7 @@ class _MeasurementRecordDetailPageState
   @override
   Widget build(BuildContext context) {
     final path = widget.summary.filePath;
+    final hasRawCurve = _error == null && _x.isNotEmpty;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF4F7FB),
@@ -464,132 +492,149 @@ class _MeasurementRecordDetailPageState
       body: SafeArea(
         child: _loading
             ? const Center(child: CircularProgressIndicator())
-            : (_error != null)
-                ? Center(
-                    child: Text(
-                      _error!,
-                      style: const TextStyle(color: Colors.black54),
-                      textAlign: TextAlign.center,
+            : ListView(
+                padding: const EdgeInsets.all(16),
+                children: [
+                  // ✅ Summary card：温度先写，力后写；字段齐全
+                  Card(
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                  )
-                : ListView(
-                    padding: const EdgeInsets.all(16),
-                    children: [
-                      // ✅ Summary card：温度先写，力后写；字段齐全
-                      Card(
-                        elevation: 4,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(14),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('开始时间: ${fmtDt(widget.summary.startTime)}',
-                                  style: const TextStyle(
-                                      fontSize: 13, color: Colors.black54)),
-                              const SizedBox(height: 4),
-                              Text('结束时间: ${fmtDt(widget.summary.endTime)}',
-                                  style: const TextStyle(
-                                      fontSize: 13, color: Colors.black54)),
-                              const SizedBox(height: 8),
-                              Text('采样点数: ${widget.summary.count}',
-                                  style: const TextStyle(
-                                      fontSize: 13, color: Colors.black54)),
-                              if (widget.summary.hasPpt) ...[
-                                const SizedBox(height: 12),
-                                const Text('智能评估',
-                                    style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w700,
-                                        color: Colors.teal)),
-                                const SizedBox(height: 6),
-                                _stat_line(
-                                    '身体区域', widget.summary.bodyRegionLabel),
-                                _stat_line(
-                                    '主诉类型', widget.summary.symptomTypeLabel),
-                                _stat_line('PPT',
-                                    '${widget.summary.pptValue.toStringAsFixed(1)} N'),
-                                _stat_line('标准化压力',
-                                    '${widget.summary.pptPressure.toStringAsFixed(1)} N/cm²'),
-                                _stat_line(
-                                  '参考百分位',
-                                  widget.summary.referenceStatus == 'ok'
-                                      ? '第 ${widget.summary.referencePercentile.toStringAsFixed(0)} 百分位'
-                                      : '暂无参考',
-                                ),
-                                _stat_line(
-                                    '敏化提示', widget.summary.sensitizationLabel),
-                                _stat_line('曲线质量',
-                                    '${widget.summary.curveQualityScore.toStringAsFixed(0)} / 100'),
-                              ],
-                              const SizedBox(height: 12),
-                              const Text('温度',
-                                  style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w700,
-                                      color: Colors.orange)),
-                              const SizedBox(height: 6),
-                              _stat_line('最大值',
-                                  '${widget.summary.maxTemp.toStringAsFixed(1)} °C'),
-                              _stat_line('最小值',
-                                  '${widget.summary.minTemp.toStringAsFixed(1)} °C'),
-                              _stat_line('平均值',
-                                  '${widget.summary.avgTemp.toStringAsFixed(1)} °C'),
-                              const SizedBox(height: 12),
-                              const Text('压力',
-                                  style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w700,
-                                      color: Colors.blue)),
-                              const SizedBox(height: 6),
-                              _stat_line('最大值',
-                                  '${widget.summary.maxForce.toStringAsFixed(1)} N'),
-                              _stat_line('最小值',
-                                  '${widget.summary.minForce.toStringAsFixed(1)} N'),
-                              _stat_line('平均值',
-                                  '${widget.summary.avgForce.toStringAsFixed(1)} N'),
-                              const SizedBox(height: 10),
-                              Text(
-                                path.isEmpty ? 'CSV文件: 无' : 'CSV文件: $path',
-                                style: const TextStyle(
-                                    fontSize: 12, color: Colors.black45),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
+                    child: Padding(
+                      padding: const EdgeInsets.all(14),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('开始时间: ${fmtDt(widget.summary.startTime)}',
+                              style: const TextStyle(
+                                  fontSize: 13, color: Colors.black54)),
+                          const SizedBox(height: 4),
+                          Text('结束时间: ${fmtDt(widget.summary.endTime)}',
+                              style: const TextStyle(
+                                  fontSize: 13, color: Colors.black54)),
+                          const SizedBox(height: 8),
+                          Text('采样点数: ${widget.summary.count}',
+                              style: const TextStyle(
+                                  fontSize: 13, color: Colors.black54)),
+                          if (widget.summary.hasPpt) ...[
+                            const SizedBox(height: 12),
+                            const Text('智能评估',
+                                style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.teal)),
+                            const SizedBox(height: 6),
+                            _stat_line('身体区域', widget.summary.bodyRegionLabel),
+                            _stat_line('主诉类型', widget.summary.symptomTypeLabel),
+                            _stat_line('PPT',
+                                '${widget.summary.pptValue.toStringAsFixed(1)} N'),
+                            _stat_line('标准化压力',
+                                '${widget.summary.pptPressure.toStringAsFixed(1)} N/cm²'),
+                            _stat_line(
+                              '参考百分位',
+                              widget.summary.referenceStatus == 'ok'
+                                  ? '第 ${widget.summary.referencePercentile.toStringAsFixed(0)} 百分位'
+                                  : '暂无参考',
+                            ),
+                            _stat_line(
+                                '敏化提示', widget.summary.sensitizationLabel),
+                            _stat_line('曲线质量',
+                                '${widget.summary.curveQualityScore.toStringAsFixed(0)} / 100'),
+                          ],
+                          const SizedBox(height: 12),
+                          const Text('温度',
+                              style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.orange)),
+                          const SizedBox(height: 6),
+                          _stat_line('最大值',
+                              '${widget.summary.maxTemp.toStringAsFixed(1)} °C'),
+                          _stat_line('最小值',
+                              '${widget.summary.minTemp.toStringAsFixed(1)} °C'),
+                          _stat_line('平均值',
+                              '${widget.summary.avgTemp.toStringAsFixed(1)} °C'),
+                          const SizedBox(height: 12),
+                          const Text('压力',
+                              style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.blue)),
+                          const SizedBox(height: 6),
+                          _stat_line('最大值',
+                              '${widget.summary.maxForce.toStringAsFixed(1)} N'),
+                          _stat_line('最小值',
+                              '${widget.summary.minForce.toStringAsFixed(1)} N'),
+                          _stat_line('平均值',
+                              '${widget.summary.avgForce.toStringAsFixed(1)} N'),
+                          const SizedBox(height: 10),
+                          Text(
+                            path.isEmpty ? 'CSV文件: 无' : 'CSV文件: $path',
+                            style: const TextStyle(
+                                fontSize: 12, color: Colors.black45),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                        ),
+                        ],
                       ),
-
-                      const SizedBox(height: 14),
-
-                      // 温度图
-                      _buildDetailChartCard(
-                        isTemp: true,
-                        title: '温度',
-                        y: _temp,
-                        unitSuffix: '°C',
-                        color: const Color(0xFFF4A460),
-                        viewMinX: _tempViewMinX,
-                        viewMaxX: _tempViewMaxX,
-                      ),
-
-                      const SizedBox(height: 14),
-
-                      // 压力图
-                      _buildDetailChartCard(
-                        isTemp: false,
-                        title: '压力',
-                        y: _force,
-                        unitSuffix: 'N',
-                        color: const Color(0xFF4A90E2),
-                        viewMinX: _forceViewMinX,
-                        viewMaxX: _forceViewMaxX,
-                      ),
-                    ],
+                    ),
                   ),
+
+                  const SizedBox(height: 14),
+
+                  if (!hasRawCurve)
+                    _buildNoticeCard(_error ?? '原始曲线文件不可用')
+                  else ...[
+                    // 温度图
+                    _buildDetailChartCard(
+                      isTemp: true,
+                      title: '温度',
+                      y: _temp,
+                      unitSuffix: '°C',
+                      color: const Color(0xFFF4A460),
+                      viewMinX: _tempViewMinX,
+                      viewMaxX: _tempViewMaxX,
+                    ),
+
+                    const SizedBox(height: 14),
+
+                    // 压力图
+                    _buildDetailChartCard(
+                      isTemp: false,
+                      title: '压力',
+                      y: _force,
+                      unitSuffix: 'N',
+                      color: const Color(0xFF4A90E2),
+                      viewMinX: _forceViewMinX,
+                      viewMaxX: _forceViewMaxX,
+                    ),
+                  ],
+                ],
+              ),
+      ),
+    );
+  }
+
+  Widget _buildNoticeCard(String message) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Icon(Icons.info_outline, color: Colors.orange),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                message,
+                style: const TextStyle(fontSize: 13, color: Colors.black54),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
