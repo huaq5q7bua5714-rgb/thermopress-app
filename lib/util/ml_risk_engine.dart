@@ -4,7 +4,7 @@ import 'package:poct_app/data/measurement_models.dart';
 import 'package:poct_app/pages/home/patient_controller.dart';
 
 class MlRiskEngine {
-  static const String modelVersion = 'ml_risk_v1_logistic_prototype';
+  static const String modelVersion = 'ml_sensitization_v1';
 
   static MlRiskResult evaluate({
     required CurveAnalysisResult curve,
@@ -20,7 +20,7 @@ class MlRiskEngine {
       return MlRiskResult.empty(
         modelVersion: modelVersion,
         reasonText: curve.invalidReason.isEmpty
-            ? '曲线无效，暂不进行机器学习风险评估。'
+            ? '曲线无效，暂不进行机器学习辅助评估。'
             : curve.invalidReason,
       );
     }
@@ -107,9 +107,17 @@ class MlRiskEngine {
         .where((item) =>
             item.curveValid &&
             item.pptPressure > 0 &&
-            item.bodyRegion == BodyRegions.id(session.bodyRegion))
+            item.bodyRegion == BodyRegions.id(session.bodyRegion) &&
+            _sameAcupoint(item.acupointName, session.acupointName))
         .toList()
       ..sort((a, b) => b.endTime.compareTo(a.endTime));
+  }
+
+  static bool _sameAcupoint(String saved, String current) {
+    final savedName = saved.trim().toLowerCase();
+    final currentName = current.trim().toLowerCase();
+    if (savedName.isEmpty || currentName.isEmpty) return true;
+    return savedName == currentName;
   }
 
   static double _trendDelta(

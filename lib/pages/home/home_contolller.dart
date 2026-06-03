@@ -359,6 +359,7 @@ class HomeController extends GetxController with BleCallback {
       startTime: sessionStart,
       bodyRegion: selection.bodyRegion,
       symptomType: selection.symptomType,
+      acupointName: selection.acupointName,
       algorithmVersion: CurveAnalyzer.algorithmVersion,
     );
 
@@ -426,6 +427,7 @@ class HomeController extends GetxController with BleCallback {
           startTime: fallbackStart,
           bodyRegion: BodyRegion.lumbosacral,
           symptomType: SymptomType.skipped,
+          acupointName: '',
           algorithmVersion: CurveAnalyzer.algorithmVersion,
         );
 
@@ -468,6 +470,7 @@ class HomeController extends GetxController with BleCallback {
       count: count,
       bodyRegion: BodyRegions.id(session.bodyRegion),
       symptomType: SymptomTypes.id(session.symptomType),
+      acupointName: session.acupointName,
       algorithmVersion: curve.algorithmVersion,
       probeAreaCm2: _probeAreaCm2,
       maxForce: maxForce,

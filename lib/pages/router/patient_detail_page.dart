@@ -173,7 +173,7 @@ class PatientDetailPage extends StatelessWidget {
                               if (latest.hasPpt) ...[
                                 const SizedBox(height: 4),
                                 Text(
-                                  '${latest.bodyRegionLabel} · PPT ${latest.pptValue.toStringAsFixed(1)}N · ${latest.sensitizationLabel}',
+                                  '${latest.siteLabel} · PPT ${latest.pptValue.toStringAsFixed(1)}N · ${latest.sensitizationLabel}',
                                   style: const TextStyle(
                                       fontSize: 13,
                                       color: Colors.teal,
@@ -288,7 +288,7 @@ class PatientDetailPage extends StatelessWidget {
                             ),
                             subtitle: Text(
                               s.hasPpt
-                                  ? '${s.bodyRegionLabel} · PPT ${s.pptValue.toStringAsFixed(1)}N · ${s.sensitizationLabel}'
+                                  ? '${s.siteLabel} · PPT ${s.pptValue.toStringAsFixed(1)}N · ${s.sensitizationLabel}'
                                   : '平均温度: ${s.avgTemp.toStringAsFixed(1)}°C, '
                                       '平均压力: ${s.avgForce.toStringAsFixed(0)}N',
                               style: const TextStyle(

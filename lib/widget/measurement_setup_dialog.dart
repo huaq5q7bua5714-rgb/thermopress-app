@@ -11,6 +11,13 @@ class MeasurementSetupDialog extends StatefulWidget {
 class _MeasurementSetupDialogState extends State<MeasurementSetupDialog> {
   BodyRegion _region = BodyRegion.knee;
   SymptomType _symptom = SymptomType.skipped;
+  final TextEditingController _acupointController = TextEditingController();
+
+  @override
+  void dispose() {
+    _acupointController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,6 +61,21 @@ class _MeasurementSetupDialogState extends State<MeasurementSetupDialog> {
                 );
               }).toList(),
             ),
+            const SizedBox(height: 18),
+            const Text(
+              '具体穴位',
+              style: TextStyle(fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              controller: _acupointController,
+              textInputAction: TextInputAction.done,
+              decoration: const InputDecoration(
+                hintText: '可选，如 足三里 / 肾俞 / 三阴交',
+                border: OutlineInputBorder(),
+                isDense: true,
+              ),
+            ),
           ],
         ),
       ),
@@ -71,6 +93,7 @@ class _MeasurementSetupDialogState extends State<MeasurementSetupDialog> {
               MeasurementSelection(
                 bodyRegion: _region,
                 symptomType: _symptom,
+                acupointName: _acupointController.text.trim(),
               ),
             );
           },

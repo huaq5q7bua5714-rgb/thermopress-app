@@ -127,10 +127,12 @@ class SymptomTypes {
 class MeasurementSelection {
   final BodyRegion bodyRegion;
   final SymptomType symptomType;
+  final String acupointName;
 
   const MeasurementSelection({
     required this.bodyRegion,
     required this.symptomType,
+    this.acupointName = '',
   });
 }
 
@@ -139,6 +141,7 @@ class MeasurementSessionDraft {
   final DateTime startTime;
   final BodyRegion bodyRegion;
   final SymptomType symptomType;
+  final String acupointName;
   final String algorithmVersion;
 
   const MeasurementSessionDraft({
@@ -147,6 +150,7 @@ class MeasurementSessionDraft {
     required this.bodyRegion,
     required this.symptomType,
     required this.algorithmVersion,
+    this.acupointName = '',
   });
 }
 

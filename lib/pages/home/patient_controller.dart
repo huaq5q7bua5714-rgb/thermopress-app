@@ -44,6 +44,7 @@ class MeasurementSummary {
   final int count;
   final String bodyRegion;
   final String symptomType;
+  final String acupointName;
   final String algorithmVersion;
   final double probeAreaCm2;
 
@@ -89,6 +90,7 @@ class MeasurementSummary {
     required this.count,
     this.bodyRegion = 'lumbosacral',
     this.symptomType = 'skipped',
+    this.acupointName = '',
     this.algorithmVersion = '',
     this.probeAreaCm2 = 1.0,
     required this.maxForce,
@@ -131,6 +133,7 @@ class MeasurementSummary {
         'count': count,
         'bodyRegion': bodyRegion,
         'symptomType': symptomType,
+        'acupointName': acupointName,
         'algorithmVersion': algorithmVersion,
         'probeAreaCm2': probeAreaCm2,
         'maxForce': maxForce,
@@ -190,6 +193,7 @@ class MeasurementSummary {
           : int.tryParse('${json['count']}') ?? 0,
       bodyRegion: _str(json['bodyRegion'], 'lumbosacral'),
       symptomType: _str(json['symptomType'], 'skipped'),
+      acupointName: _str(json['acupointName']),
       algorithmVersion: _str(json['algorithmVersion']),
       probeAreaCm2:
           _num(json['probeAreaCm2']) == 0 ? 1.0 : _num(json['probeAreaCm2']),
@@ -237,6 +241,12 @@ class MeasurementSummary {
 
   String get symptomTypeLabel =>
       SymptomTypes.label(SymptomTypes.fromId(symptomType));
+
+  String get siteLabel {
+    final acupoint = acupointName.trim();
+    if (acupoint.isEmpty) return bodyRegionLabel;
+    return '$bodyRegionLabel · $acupoint';
+  }
 
   String get sensitizationLabel =>
       SensitizationLevels.label(sensitizationLevel);

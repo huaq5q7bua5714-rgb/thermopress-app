@@ -135,7 +135,7 @@ class _MeasurementResultPageState extends State<MeasurementResultPage> {
             ),
             const SizedBox(height: 8),
             Text(
-              '${s.bodyRegionLabel} · ${s.symptomTypeLabel}',
+              '${s.siteLabel} · ${s.symptomTypeLabel}',
               style: const TextStyle(color: Colors.black54),
             ),
             const SizedBox(height: 14),
@@ -151,8 +151,8 @@ class _MeasurementResultPageState extends State<MeasurementResultPage> {
                 _metric('标准化压力', pressure),
                 _metric('参考位置', percentile),
                 _metric('曲线质量', '${_fmt(s.curveQualityScore, 0)} / 100'),
-                _metric('AI风险', mlRisk),
-                _metric('AI置信度', mlConfidence),
+                _metric('敏化风险分层', mlRisk),
+                _metric('评估可信度', mlConfidence),
               ],
             ),
             const SizedBox(height: 12),
@@ -166,7 +166,7 @@ class _MeasurementResultPageState extends State<MeasurementResultPage> {
             if (s.hasMlRisk && s.mlReasonText.isNotEmpty) ...[
               const SizedBox(height: 8),
               Text(
-                'AI依据：${s.mlReasonText}',
+                '机器学习判别依据：${s.mlReasonText}',
                 style: TextStyle(
                   fontSize: 13,
                   color: _mlRiskColor(s.mlRiskLevel),
