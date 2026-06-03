@@ -552,6 +552,38 @@ class _MeasurementRecordDetailPageState
                                 '敏化提示', widget.summary.sensitizationLabel),
                             _stat_line('曲线质量',
                                 '${widget.summary.curveQualityScore.toStringAsFixed(0)} / 100'),
+                            if (widget.summary.hasMlRisk) ...[
+                              const SizedBox(height: 8),
+                              const Text('AI风险评估',
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.indigo)),
+                              const SizedBox(height: 6),
+                              _stat_line(
+                                'AI风险',
+                                '${widget.summary.mlRiskLabel} '
+                                    '${(widget.summary.mlRiskScore * 100).toStringAsFixed(0)}%',
+                              ),
+                              _stat_line(
+                                'AI置信度',
+                                '${(widget.summary.mlConfidence * 100).toStringAsFixed(0)}%',
+                              ),
+                              _stat_line('模型版本', widget.summary.mlModelVersion),
+                              if (widget.summary.mlReasonText.isNotEmpty)
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 2),
+                                  child: Text(
+                                    'AI依据：${widget.summary.mlReasonText}',
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      color: Colors.black87,
+                                      height: 1.35,
+                                    ),
+                                  ),
+                                ),
+                            ],
                           ],
                           const SizedBox(height: 12),
                           const Text('温度',

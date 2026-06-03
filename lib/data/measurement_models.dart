@@ -266,6 +266,60 @@ class SensitizationResult {
   });
 }
 
+class MlRiskResult {
+  final double riskScore;
+  final String riskLevel;
+  final double confidence;
+  final String modelVersion;
+  final String reasonText;
+  final double temperatureRange;
+  final double trendDelta;
+
+  const MlRiskResult({
+    required this.riskScore,
+    required this.riskLevel,
+    required this.confidence,
+    required this.modelVersion,
+    required this.reasonText,
+    required this.temperatureRange,
+    required this.trendDelta,
+  });
+
+  factory MlRiskResult.empty({
+    String modelVersion = '',
+    String reasonText = '',
+  }) {
+    return MlRiskResult(
+      riskScore: 0,
+      riskLevel: 'unavailable',
+      confidence: 0,
+      modelVersion: modelVersion,
+      reasonText: reasonText,
+      temperatureRange: 0,
+      trendDelta: 0,
+    );
+  }
+}
+
+class MlRiskLevels {
+  static String label(String level) {
+    switch (level) {
+      case 'high':
+        return '高风险';
+      case 'medium':
+        return '中风险';
+      case 'low':
+        return '低风险';
+      case 'uncertain':
+        return '证据不足';
+      case 'unavailable':
+        return '暂未评估';
+      default:
+        return '暂未评估';
+    }
+  }
+}
+
 class SensitizationLevels {
   static String label(String level) {
     switch (level) {

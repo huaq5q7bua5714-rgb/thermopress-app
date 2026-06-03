@@ -8,6 +8,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:poct_app/data/measurement_models.dart';
 import 'package:poct_app/pages/router/measurement_result_page.dart';
 import 'package:poct_app/util/curve_analyzer.dart';
+import 'package:poct_app/util/ml_risk_engine.dart';
 import 'package:poct_app/util/reference_engine.dart';
 import 'package:poct_app/widget/measurement_setup_dialog.dart';
 
@@ -449,6 +450,16 @@ class HomeController extends GetxController with BleCallback {
       curve: curve,
       reference: reference,
     );
+    final mlRisk = MlRiskEngine.evaluate(
+      curve: curve,
+      reference: reference,
+      patient: p,
+      session: session,
+      avgTemp: sumTemp / count,
+      maxTemp: maxTemp,
+      minTemp: minTemp,
+      history: pc.getHistoryForPatient(p.phone),
+    );
 
     final summary = MeasurementSummary(
       sessionId: session.sessionId,
@@ -483,6 +494,13 @@ class HomeController extends GetxController with BleCallback {
       referenceQuality: reference.quality,
       sensitizationLevel: assessment.level,
       suggestionText: assessment.suggestion,
+      mlRiskScore: mlRisk.riskScore,
+      mlRiskLevel: mlRisk.riskLevel,
+      mlConfidence: mlRisk.confidence,
+      mlModelVersion: mlRisk.modelVersion,
+      mlReasonText: mlRisk.reasonText,
+      mlTemperatureRange: mlRisk.temperatureRange,
+      mlTrendDelta: mlRisk.trendDelta,
     );
 
     pc.addMeasurementRecord(p.phone, summary); // ✅新增：写入历史

@@ -74,6 +74,13 @@ class MeasurementSummary {
   final String referenceQuality;
   final String sensitizationLevel;
   final String suggestionText;
+  final double mlRiskScore;
+  final String mlRiskLevel;
+  final double mlConfidence;
+  final String mlModelVersion;
+  final String mlReasonText;
+  final double mlTemperatureRange;
+  final double mlTrendDelta;
 
   MeasurementSummary({
     this.sessionId = '',
@@ -108,6 +115,13 @@ class MeasurementSummary {
     this.referenceQuality = '',
     this.sensitizationLevel = '',
     this.suggestionText = '',
+    this.mlRiskScore = 0,
+    this.mlRiskLevel = 'unavailable',
+    this.mlConfidence = 0,
+    this.mlModelVersion = '',
+    this.mlReasonText = '',
+    this.mlTemperatureRange = 0,
+    this.mlTrendDelta = 0,
   });
 
   Map<String, dynamic> toJson() => {
@@ -143,6 +157,13 @@ class MeasurementSummary {
         'referenceQuality': referenceQuality,
         'sensitizationLevel': sensitizationLevel,
         'suggestionText': suggestionText,
+        'mlRiskScore': mlRiskScore,
+        'mlRiskLevel': mlRiskLevel,
+        'mlConfidence': mlConfidence,
+        'mlModelVersion': mlModelVersion,
+        'mlReasonText': mlReasonText,
+        'mlTemperatureRange': mlTemperatureRange,
+        'mlTrendDelta': mlTrendDelta,
       };
 
   factory MeasurementSummary.fromJson(Map<String, dynamic> json) {
@@ -196,6 +217,13 @@ class MeasurementSummary {
       referenceQuality: _str(json['referenceQuality']),
       sensitizationLevel: _str(json['sensitizationLevel']),
       suggestionText: _str(json['suggestionText']),
+      mlRiskScore: _num(json['mlRiskScore']),
+      mlRiskLevel: _str(json['mlRiskLevel'], 'unavailable'),
+      mlConfidence: _num(json['mlConfidence']),
+      mlModelVersion: _str(json['mlModelVersion']),
+      mlReasonText: _str(json['mlReasonText']),
+      mlTemperatureRange: _num(json['mlTemperatureRange']),
+      mlTrendDelta: _num(json['mlTrendDelta']),
     );
   }
 
@@ -212,6 +240,10 @@ class MeasurementSummary {
 
   String get sensitizationLabel =>
       SensitizationLevels.label(sensitizationLevel);
+
+  bool get hasMlRisk => mlModelVersion.trim().isNotEmpty;
+
+  String get mlRiskLabel => MlRiskLevels.label(mlRiskLevel);
 
   bool same_as(MeasurementSummary other) {
     if (sessionId.isNotEmpty && other.sessionId.isNotEmpty) {

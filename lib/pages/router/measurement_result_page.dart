@@ -111,6 +111,11 @@ class _MeasurementResultPageState extends State<MeasurementResultPage> {
         : '暂无参考';
     final pressure =
         s.pptPressure > 0 ? '${_fmt(s.pptPressure, 1)} N/cm²' : '--';
+    final mlRisk = s.hasMlRisk
+        ? '${s.mlRiskLabel} ${_fmt(s.mlRiskScore * 100, 0)}%'
+        : '--';
+    final mlConfidence =
+        s.hasMlRisk ? '${_fmt(s.mlConfidence * 100, 0)}%' : '--';
 
     return Card(
       elevation: 3,
@@ -146,6 +151,8 @@ class _MeasurementResultPageState extends State<MeasurementResultPage> {
                 _metric('标准化压力', pressure),
                 _metric('参考位置', percentile),
                 _metric('曲线质量', '${_fmt(s.curveQualityScore, 0)} / 100'),
+                _metric('AI风险', mlRisk),
+                _metric('AI置信度', mlConfidence),
               ],
             ),
             const SizedBox(height: 12),
@@ -156,6 +163,17 @@ class _MeasurementResultPageState extends State<MeasurementResultPage> {
               style: const TextStyle(
                   fontSize: 13, color: Colors.black87, height: 1.4),
             ),
+            if (s.hasMlRisk && s.mlReasonText.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Text(
+                'AI依据：${s.mlReasonText}',
+                style: TextStyle(
+                  fontSize: 13,
+                  color: _mlRiskColor(s.mlRiskLevel),
+                  height: 1.4,
+                ),
+              ),
+            ],
           ],
         ),
       ),
@@ -269,6 +287,21 @@ class _MeasurementResultPageState extends State<MeasurementResultPage> {
         return Colors.green;
       default:
         return Colors.blueGrey;
+    }
+  }
+
+  Color _mlRiskColor(String level) {
+    switch (level) {
+      case 'high':
+        return Colors.redAccent;
+      case 'medium':
+        return Colors.deepOrange;
+      case 'low':
+        return Colors.green;
+      case 'uncertain':
+        return Colors.blueGrey;
+      default:
+        return Colors.black54;
     }
   }
 
