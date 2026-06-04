@@ -79,6 +79,7 @@ void main() {
     expect(result.riskScore, inInclusiveRange(0, 1));
     expect(result.confidence, inInclusiveRange(0, 1));
     expect(result.riskLevel, isNot('unavailable'));
+    expect(result.reasonText, '模型结果与PPT参考分层一致，未发现额外异常信号。');
   });
 
   test('MlRiskEngine treats temperature range as a weak auxiliary feature', () {
@@ -142,7 +143,8 @@ void main() {
     );
 
     expect(shakyTemp.riskScore - stableTemp.riskScore, lessThan(0.04));
-    expect(stableTemp.reasonText, contains('未显示明显敏化风险'));
+    expect(stableTemp.reasonText, contains('未提示额外敏化风险'));
+    expect(stableTemp.reasonText, isNot(contains('参考百分位')));
     expect(stableTemp.reasonText, isNot(contains('曲线质量')));
   });
 

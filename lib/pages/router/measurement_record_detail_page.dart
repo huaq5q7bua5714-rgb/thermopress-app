@@ -579,7 +579,7 @@ class _MeasurementRecordDetailPageState
                                   padding:
                                       const EdgeInsets.symmetric(vertical: 2),
                                   child: Text(
-                                    '主要影响因素：${widget.summary.mlReasonText}',
+                                    '辅助评估说明：${widget.summary.mlReasonText}',
                                     style: const TextStyle(
                                       fontSize: 13,
                                       color: Colors.black87,

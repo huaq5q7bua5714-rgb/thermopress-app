@@ -98,9 +98,7 @@ class MlRiskEngine {
       riskLevel: level,
       confidence: confidence,
       modelVersion: modelVersion,
-      reasonText: reasons.isEmpty
-          ? 'PPT与参考百分位未显示明显敏化风险，建议结合临床主诉和后续趋势观察。'
-          : reasons.join('；'),
+      reasonText: reasons.isEmpty ? _fallbackReason(score) : reasons.join('；'),
       temperatureRange: tempRange,
       trendDelta: trendDelta,
     );
@@ -158,6 +156,8 @@ class MlRiskEngine {
   static List<String> _topReasons(List<_Feature> features) {
     final ranked = features
         .where((feature) =>
+            feature.name != 'PPT偏低' &&
+            feature.name != '参考百分位偏低' &&
             feature.name != '曲线质量' &&
             feature.value >= 0.35 &&
             feature.value * feature.weight >= 0.15)
@@ -173,6 +173,13 @@ class MlRiskEngine {
       if (feature.name == '历史下降趋势') return '同测点历史PPT呈下降趋势';
       return feature.name;
     }).toList();
+  }
+
+  static String _fallbackReason(double score) {
+    if (score >= 0.45) {
+      return '模型结果与PPT参考分层一致，未发现额外异常信号。';
+    }
+    return '模型未提示额外敏化风险，建议结合临床主诉和后续趋势观察。';
   }
 
   static double _clamp01(double value) => value.clamp(0.0, 1.0).toDouble();

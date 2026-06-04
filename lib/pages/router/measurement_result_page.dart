@@ -173,7 +173,7 @@ class _MeasurementResultPageState extends State<MeasurementResultPage> {
             if (s.hasMlRisk && s.mlReasonText.isNotEmpty) ...[
               const SizedBox(height: 8),
               Text(
-                '主要影响因素：${s.mlReasonText}',
+                '辅助评估说明：${s.mlReasonText}',
                 style: TextStyle(
                   fontSize: 13,
                   color: _mlRiskColor(s.mlRiskLevel),
