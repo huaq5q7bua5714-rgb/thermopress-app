@@ -446,6 +446,7 @@ class HomeController extends GetxController with BleCallback {
             bodyRegion: session.bodyRegion,
             pptForce: curve.pptValue,
             probeAreaCm2: _probeAreaCm2,
+            acupointName: session.acupointName,
           )
         : ReferenceResult.unavailable(note: curve.invalidReason);
     final assessment = SensitizationEngine.evaluate(
@@ -470,7 +471,11 @@ class HomeController extends GetxController with BleCallback {
       count: count,
       bodyRegion: BodyRegions.id(session.bodyRegion),
       symptomType: SymptomTypes.id(session.symptomType),
-      acupointName: session.acupointName,
+      acupointName: reference.matchedAcupointName.isNotEmpty
+          ? reference.matchedAcupointName
+          : session.acupointName,
+      acupointCode: reference.matchedAcupointCode,
+      acupointMeridian: reference.matchedAcupointMeridian,
       algorithmVersion: curve.algorithmVersion,
       probeAreaCm2: _probeAreaCm2,
       maxForce: maxForce,
@@ -495,6 +500,8 @@ class HomeController extends GetxController with BleCallback {
       referenceStatus: reference.status,
       referenceSource: reference.source,
       referenceQuality: reference.quality,
+      referenceMode: reference.referenceMode,
+      referenceNote: reference.note,
       sensitizationLevel: assessment.level,
       suggestionText: assessment.suggestion,
       mlRiskScore: mlRisk.riskScore,

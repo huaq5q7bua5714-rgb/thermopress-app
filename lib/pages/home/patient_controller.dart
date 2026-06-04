@@ -45,6 +45,8 @@ class MeasurementSummary {
   final String bodyRegion;
   final String symptomType;
   final String acupointName;
+  final String acupointCode;
+  final String acupointMeridian;
   final String algorithmVersion;
   final double probeAreaCm2;
 
@@ -73,6 +75,8 @@ class MeasurementSummary {
   final String referenceStatus;
   final String referenceSource;
   final String referenceQuality;
+  final String referenceMode;
+  final String referenceNote;
   final String sensitizationLevel;
   final String suggestionText;
   final double mlRiskScore;
@@ -91,6 +95,8 @@ class MeasurementSummary {
     this.bodyRegion = 'lumbosacral',
     this.symptomType = 'skipped',
     this.acupointName = '',
+    this.acupointCode = '',
+    this.acupointMeridian = '',
     this.algorithmVersion = '',
     this.probeAreaCm2 = 1.0,
     required this.maxForce,
@@ -115,6 +121,8 @@ class MeasurementSummary {
     this.referenceStatus = 'unavailable',
     this.referenceSource = '',
     this.referenceQuality = '',
+    this.referenceMode = '',
+    this.referenceNote = '',
     this.sensitizationLevel = '',
     this.suggestionText = '',
     this.mlRiskScore = 0,
@@ -134,6 +142,8 @@ class MeasurementSummary {
         'bodyRegion': bodyRegion,
         'symptomType': symptomType,
         'acupointName': acupointName,
+        'acupointCode': acupointCode,
+        'acupointMeridian': acupointMeridian,
         'algorithmVersion': algorithmVersion,
         'probeAreaCm2': probeAreaCm2,
         'maxForce': maxForce,
@@ -158,6 +168,8 @@ class MeasurementSummary {
         'referenceStatus': referenceStatus,
         'referenceSource': referenceSource,
         'referenceQuality': referenceQuality,
+        'referenceMode': referenceMode,
+        'referenceNote': referenceNote,
         'sensitizationLevel': sensitizationLevel,
         'suggestionText': suggestionText,
         'mlRiskScore': mlRiskScore,
@@ -194,6 +206,8 @@ class MeasurementSummary {
       bodyRegion: _str(json['bodyRegion'], 'lumbosacral'),
       symptomType: _str(json['symptomType'], 'skipped'),
       acupointName: _str(json['acupointName']),
+      acupointCode: _str(json['acupointCode']),
+      acupointMeridian: _str(json['acupointMeridian']),
       algorithmVersion: _str(json['algorithmVersion']),
       probeAreaCm2:
           _num(json['probeAreaCm2']) == 0 ? 1.0 : _num(json['probeAreaCm2']),
@@ -219,6 +233,8 @@ class MeasurementSummary {
       referenceStatus: _str(json['referenceStatus'], 'unavailable'),
       referenceSource: _str(json['referenceSource']),
       referenceQuality: _str(json['referenceQuality']),
+      referenceMode: _str(json['referenceMode']),
+      referenceNote: _str(json['referenceNote']),
       sensitizationLevel: _str(json['sensitizationLevel']),
       suggestionText: _str(json['suggestionText']),
       mlRiskScore: _num(json['mlRiskScore']),
@@ -245,7 +261,22 @@ class MeasurementSummary {
   String get siteLabel {
     final acupoint = acupointName.trim();
     if (acupoint.isEmpty) return bodyRegionLabel;
-    return '$bodyRegionLabel · $acupoint';
+    final code = acupointCode.trim();
+    final point = code.isEmpty ? acupoint : '$acupoint $code';
+    return '$bodyRegionLabel · $point';
+  }
+
+  String get referenceModeLabel {
+    switch (referenceMode) {
+      case 'region_reference':
+        return '区域参考库';
+      case 'region_fallback':
+        return '穴位映射 + 区域参考库';
+      case 'direct_acupoint_reference':
+        return '穴位专属参考库';
+      default:
+        return referenceStatus == 'ok' ? '区域参考库' : '暂无参考';
+    }
   }
 
   String get sensitizationLabel =>

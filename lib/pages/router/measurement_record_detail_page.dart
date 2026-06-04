@@ -537,6 +537,8 @@ class _MeasurementRecordDetailPageState
                                     color: Colors.teal)),
                             const SizedBox(height: 6),
                             _stat_line('测量部位', widget.summary.siteLabel),
+                            if (widget.summary.acupointMeridian.isNotEmpty)
+                              _stat_line('经络', widget.summary.acupointMeridian),
                             _stat_line('主诉类型', widget.summary.symptomTypeLabel),
                             _stat_line('PPT',
                                 '${widget.summary.pptValue.toStringAsFixed(1)} N'),
@@ -548,6 +550,8 @@ class _MeasurementRecordDetailPageState
                                   ? '第 ${widget.summary.referencePercentile.toStringAsFixed(0)} 百分位'
                                   : '暂无参考',
                             ),
+                            _stat_line(
+                                '参考策略', widget.summary.referenceModeLabel),
                             _stat_line(
                                 '敏化提示', widget.summary.sensitizationLabel),
                             _stat_line('曲线质量',

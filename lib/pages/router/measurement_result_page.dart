@@ -138,6 +138,13 @@ class _MeasurementResultPageState extends State<MeasurementResultPage> {
               '${s.siteLabel} · ${s.symptomTypeLabel}',
               style: const TextStyle(color: Colors.black54),
             ),
+            if (s.acupointMeridian.trim().isNotEmpty) ...[
+              const SizedBox(height: 4),
+              Text(
+                '${s.acupointMeridian} · ${s.referenceModeLabel}',
+                style: const TextStyle(color: Colors.black54, fontSize: 12),
+              ),
+            ],
             const SizedBox(height: 14),
             GridView.count(
               crossAxisCount: 2,

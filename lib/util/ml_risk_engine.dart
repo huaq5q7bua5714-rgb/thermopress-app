@@ -25,7 +25,14 @@ class MlRiskEngine {
       );
     }
 
-    final sameSiteHistory = _sameSiteHistory(history, session);
+    final targetAcupointName = reference.matchedAcupointName.isNotEmpty
+        ? reference.matchedAcupointName
+        : session.acupointName;
+    final sameSiteHistory = _sameSiteHistory(
+      history,
+      session,
+      targetAcupointName,
+    );
 
     final pptPressure = reference.pptPressure > 0
         ? reference.pptPressure
@@ -102,13 +109,14 @@ class MlRiskEngine {
   static List<MeasurementSummary> _sameSiteHistory(
     List<MeasurementSummary> history,
     MeasurementSessionDraft session,
+    String targetAcupointName,
   ) {
     return history
         .where((item) =>
             item.curveValid &&
             item.pptPressure > 0 &&
             item.bodyRegion == BodyRegions.id(session.bodyRegion) &&
-            _sameAcupoint(item.acupointName, session.acupointName))
+            _sameAcupoint(item.acupointName, targetAcupointName))
         .toList()
       ..sort((a, b) => b.endTime.compareTo(a.endTime));
   }

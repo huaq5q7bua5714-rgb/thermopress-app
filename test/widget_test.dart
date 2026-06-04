@@ -1,9 +1,22 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:poct_app/data/measurement_models.dart';
 import 'package:poct_app/pages/home/patient_controller.dart';
+import 'package:poct_app/util/acupoint_catalog.dart';
 import 'package:poct_app/util/ml_risk_engine.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  test('AcupointCatalog resolves common names and codes', () async {
+    final byName = await AcupointCatalog.resolve('足三里');
+    final byCode = await AcupointCatalog.resolve('ST36');
+
+    expect(byName?.name, '足三里');
+    expect(byName?.code, 'ST36');
+    expect(byName?.meridian, '足阳明胃经');
+    expect(byCode?.name, byName?.name);
+  });
+
   test('MlRiskEngine returns a bounded risk score for valid curves', () {
     final curve = CurveAnalysisResult(
       valid: true,

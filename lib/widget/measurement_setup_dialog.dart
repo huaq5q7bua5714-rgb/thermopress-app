@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:poct_app/data/measurement_models.dart';
+import 'package:poct_app/util/acupoint_catalog.dart';
 
 class MeasurementSetupDialog extends StatefulWidget {
   const MeasurementSetupDialog({super.key});
@@ -12,6 +13,19 @@ class _MeasurementSetupDialogState extends State<MeasurementSetupDialog> {
   BodyRegion _region = BodyRegion.knee;
   SymptomType _symptom = SymptomType.skipped;
   final TextEditingController _acupointController = TextEditingController();
+  List<AcupointCatalogEntry> _allAcupoints = const [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAcupoints();
+  }
+
+  Future<void> _loadAcupoints() async {
+    final entries = await AcupointCatalog.all();
+    if (!mounted) return;
+    setState(() => _allAcupoints = entries);
+  }
 
   @override
   void dispose() {
@@ -76,6 +90,26 @@ class _MeasurementSetupDialogState extends State<MeasurementSetupDialog> {
                 isDense: true,
               ),
             ),
+            if (_regionAcupoints.isNotEmpty) ...[
+              const SizedBox(height: 10),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: _regionAcupoints.map((entry) {
+                  final selected =
+                      _acupointController.text.trim() == entry.name ||
+                          _acupointController.text.trim().toUpperCase() ==
+                              entry.code.toUpperCase();
+                  return ChoiceChip(
+                    label: Text(entry.label),
+                    selected: selected,
+                    onSelected: (_) {
+                      setState(() => _acupointController.text = entry.name);
+                    },
+                  );
+                }).toList(),
+              ),
+            ],
           ],
         ),
       ),
@@ -101,5 +135,9 @@ class _MeasurementSetupDialogState extends State<MeasurementSetupDialog> {
         ),
       ],
     );
+  }
+
+  List<AcupointCatalogEntry> get _regionAcupoints {
+    return _allAcupoints.where((entry) => entry.belongsTo(_region)).toList();
   }
 }

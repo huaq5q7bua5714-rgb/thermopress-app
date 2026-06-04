@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/services.dart';
 import 'package:poct_app/data/measurement_models.dart';
+import 'package:poct_app/util/acupoint_catalog.dart';
 
 class ReferenceEngine {
   static Map<String, dynamic>? _cache;
@@ -11,16 +12,22 @@ class ReferenceEngine {
     required BodyRegion bodyRegion,
     required double pptForce,
     required double probeAreaCm2,
+    String acupointName = '',
   }) async {
     final safeArea = probeAreaCm2 <= 0 ? 1.0 : probeAreaCm2;
     final pptPressure = pptForce / safeArea;
+    final acupoint = await AcupointCatalog.resolve(acupointName);
+    final referenceRegionId =
+        acupoint?.referenceRegion.trim().isNotEmpty == true
+            ? acupoint!.referenceRegion
+            : BodyRegions.id(bodyRegion);
 
     final data = await _loadReferenceJson();
     final refs = (data['references'] as List? ?? const []);
     Map<String, dynamic>? entry;
     for (final item in refs) {
       final map = Map<String, dynamic>.from(item as Map);
-      if (map['region'] == BodyRegions.id(bodyRegion)) {
+      if (map['region'] == referenceRegionId) {
         entry = map;
         break;
       }
@@ -44,14 +51,31 @@ class ReferenceEngine {
     };
 
     final percentile = _interpolatePercentile(pptPressure, knots);
+    final acupointNote = acupoint == null
+        ? ''
+        : '${acupoint.name}${acupoint.code.isEmpty ? '' : ' ${acupoint.code}'}'
+            '（${acupoint.meridian}）当前采用${BodyRegions.label(BodyRegions.fromId(referenceRegionId))}区域参考库。';
+    final noteParts = [
+      if (acupointNote.isNotEmpty) acupointNote,
+      '${entry['note'] ?? ''}',
+    ].where((text) => text.trim().isNotEmpty).toList();
+
     return ReferenceResult(
       hasReference: true,
       status: 'ok',
       source: '${entry['source'] ?? ''}',
       quality: '${entry['quality'] ?? 'limited'}',
-      note: '${entry['note'] ?? ''}',
+      note: noteParts.join(' '),
       pptPressure: pptPressure,
       percentile: percentile,
+      referenceMode: acupoint == null
+          ? 'region_reference'
+          : acupoint.referenceMode.isEmpty
+              ? 'region_fallback'
+              : acupoint.referenceMode,
+      matchedAcupointName: acupoint?.name ?? '',
+      matchedAcupointCode: acupoint?.code ?? '',
+      matchedAcupointMeridian: acupoint?.meridian ?? '',
     );
   }
 

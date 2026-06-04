@@ -1,0 +1,285 @@
+{
+  "version": "acupoint_catalog_v1_region_fallback",
+  "policy": {
+    "purpose": "Map frequently used acupoints to meridian, body region, and reference strategy. Most entries use regional PPT percentile fallback unless direct acupoint-specific healthy percentile data are available.",
+    "fallback_rule": "When an acupoint does not have a direct percentile table, the app uses its mapped body-region PPT reference and records the reference mode as region_fallback.",
+    "clinical_note": "Acupoint mapping is used for structured records and explanation. It is not a standalone diagnosis."
+  },
+  "acupoints": [
+    {
+      "name": "太阳",
+      "code": "EX-HN5",
+      "aliases": ["taiyang"],
+      "meridian": "经外奇穴",
+      "region": "head_face",
+      "reference_region": "head_face",
+      "symptoms": ["other"],
+      "reference_mode": "region_fallback",
+      "note": "常用于头面部疼痛相关观察；当前使用头面部区域PPT参考库。"
+    },
+    {
+      "name": "迎香",
+      "code": "LI20",
+      "aliases": ["yingxiang"],
+      "meridian": "手阳明大肠经",
+      "region": "head_face",
+      "reference_region": "head_face",
+      "symptoms": ["other"],
+      "reference_mode": "region_fallback",
+      "note": "当前使用头面部区域PPT参考库。"
+    },
+    {
+      "name": "百会",
+      "code": "GV20",
+      "aliases": ["baihui"],
+      "meridian": "督脉",
+      "region": "head_face",
+      "reference_region": "head_face",
+      "symptoms": ["other"],
+      "reference_mode": "region_fallback",
+      "note": "当前使用头面部区域PPT参考库。"
+    },
+    {
+      "name": "风池",
+      "code": "GB20",
+      "aliases": ["fengchi"],
+      "meridian": "足少阳胆经",
+      "region": "neck_shoulder",
+      "reference_region": "neck_shoulder",
+      "symptoms": ["other"],
+      "reference_mode": "region_fallback",
+      "note": "常用于颈肩与头痛相关观察；当前使用颈肩部区域PPT参考库。"
+    },
+    {
+      "name": "肩井",
+      "code": "GB21",
+      "aliases": ["jianjing"],
+      "meridian": "足少阳胆经",
+      "region": "neck_shoulder",
+      "reference_region": "neck_shoulder",
+      "symptoms": ["other"],
+      "reference_mode": "region_fallback",
+      "note": "当前使用颈肩部区域PPT参考库。"
+    },
+    {
+      "name": "天柱",
+      "code": "BL10",
+      "aliases": ["tianzhu"],
+      "meridian": "足太阳膀胱经",
+      "region": "neck_shoulder",
+      "reference_region": "neck_shoulder",
+      "symptoms": ["other"],
+      "reference_mode": "region_fallback",
+      "note": "当前使用颈肩部区域PPT参考库。"
+    },
+    {
+      "name": "肺俞",
+      "code": "BL13",
+      "aliases": ["feishu"],
+      "meridian": "足太阳膀胱经",
+      "region": "thoracic_back",
+      "reference_region": "thoracic_back",
+      "symptoms": ["other"],
+      "reference_mode": "region_fallback",
+      "note": "当前使用胸背部区域PPT参考库。"
+    },
+    {
+      "name": "膈俞",
+      "code": "BL17",
+      "aliases": ["geshu"],
+      "meridian": "足太阳膀胱经",
+      "region": "thoracic_back",
+      "reference_region": "thoracic_back",
+      "symptoms": ["other"],
+      "reference_mode": "region_fallback",
+      "note": "当前使用胸背部区域PPT参考库。"
+    },
+    {
+      "name": "肾俞",
+      "code": "BL23",
+      "aliases": ["shenshu"],
+      "meridian": "足太阳膀胱经",
+      "region": "lumbosacral",
+      "reference_region": "lumbosacral",
+      "symptoms": ["low_back"],
+      "reference_mode": "region_fallback",
+      "note": "当前使用腰骶部区域PPT参考库。"
+    },
+    {
+      "name": "大肠俞",
+      "code": "BL25",
+      "aliases": ["dachangshu"],
+      "meridian": "足太阳膀胱经",
+      "region": "lumbosacral",
+      "reference_region": "lumbosacral",
+      "symptoms": ["low_back", "gastrointestinal"],
+      "reference_mode": "region_fallback",
+      "note": "当前使用腰骶部区域PPT参考库。"
+    },
+    {
+      "name": "腰阳关",
+      "code": "GV3",
+      "aliases": ["yaoyangguan"],
+      "meridian": "督脉",
+      "region": "lumbosacral",
+      "reference_region": "lumbosacral",
+      "symptoms": ["low_back"],
+      "reference_mode": "region_fallback",
+      "note": "当前使用腰骶部区域PPT参考库。"
+    },
+    {
+      "name": "中脘",
+      "code": "CV12",
+      "aliases": ["zhongwan"],
+      "meridian": "任脉",
+      "region": "abdomen",
+      "reference_region": "abdomen",
+      "symptoms": ["gastrointestinal"],
+      "reference_mode": "region_fallback",
+      "note": "当前使用腹部区域PPT参考库。"
+    },
+    {
+      "name": "天枢",
+      "code": "ST25",
+      "aliases": ["tianshu"],
+      "meridian": "足阳明胃经",
+      "region": "abdomen",
+      "reference_region": "abdomen",
+      "symptoms": ["gastrointestinal"],
+      "reference_mode": "region_fallback",
+      "note": "当前使用腹部区域PPT参考库。"
+    },
+    {
+      "name": "关元",
+      "code": "CV4",
+      "aliases": ["guanyuan"],
+      "meridian": "任脉",
+      "region": "abdomen",
+      "reference_region": "abdomen",
+      "symptoms": ["dysmenorrhea", "gastrointestinal"],
+      "reference_mode": "region_fallback",
+      "note": "当前使用腹部区域PPT参考库。"
+    },
+    {
+      "name": "合谷",
+      "code": "LI4",
+      "aliases": ["hegu"],
+      "meridian": "手阳明大肠经",
+      "region": "upper_limb",
+      "reference_region": "upper_limb",
+      "symptoms": ["other"],
+      "reference_mode": "region_fallback",
+      "note": "当前使用上肢区域PPT参考库。"
+    },
+    {
+      "name": "曲池",
+      "code": "LI11",
+      "aliases": ["quchi"],
+      "meridian": "手阳明大肠经",
+      "region": "upper_limb",
+      "reference_region": "upper_limb",
+      "symptoms": ["other"],
+      "reference_mode": "region_fallback",
+      "note": "当前使用上肢区域PPT参考库。"
+    },
+    {
+      "name": "内关",
+      "code": "PC6",
+      "aliases": ["neiguan"],
+      "meridian": "手厥阴心包经",
+      "region": "upper_limb",
+      "reference_region": "upper_limb",
+      "symptoms": ["gastrointestinal", "other"],
+      "reference_mode": "region_fallback",
+      "note": "当前使用上肢区域PPT参考库。"
+    },
+    {
+      "name": "内膝眼",
+      "code": "EX-LE4",
+      "aliases": ["neixiyan"],
+      "meridian": "经外奇穴",
+      "region": "knee",
+      "reference_region": "knee",
+      "symptoms": ["knee_joint"],
+      "reference_mode": "region_fallback",
+      "note": "当前使用膝关节周围区域PPT参考库。"
+    },
+    {
+      "name": "外膝眼",
+      "code": "ST35",
+      "aliases": ["waixiyan", "dubi"],
+      "meridian": "足阳明胃经",
+      "region": "knee",
+      "reference_region": "knee",
+      "symptoms": ["knee_joint"],
+      "reference_mode": "region_fallback",
+      "note": "当前使用膝关节周围区域PPT参考库。"
+    },
+    {
+      "name": "阳陵泉",
+      "code": "GB34",
+      "aliases": ["yanglingquan"],
+      "meridian": "足少阳胆经",
+      "region": "knee",
+      "reference_region": "knee",
+      "symptoms": ["knee_joint"],
+      "reference_mode": "region_fallback",
+      "note": "当前使用膝关节周围区域PPT参考库。"
+    },
+    {
+      "name": "梁丘",
+      "code": "ST34",
+      "aliases": ["liangqiu"],
+      "meridian": "足阳明胃经",
+      "region": "knee",
+      "reference_region": "knee",
+      "symptoms": ["knee_joint"],
+      "reference_mode": "region_fallback",
+      "note": "当前使用膝关节周围区域PPT参考库。"
+    },
+    {
+      "name": "足三里",
+      "code": "ST36",
+      "aliases": ["zusanli"],
+      "meridian": "足阳明胃经",
+      "region": "lower_limb_distal",
+      "reference_region": "lower_limb_distal",
+      "symptoms": ["gastrointestinal", "knee_joint"],
+      "reference_mode": "region_fallback",
+      "note": "当前使用下肢远端区域PPT参考库。"
+    },
+    {
+      "name": "三阴交",
+      "code": "SP6",
+      "aliases": ["sanyinjiao"],
+      "meridian": "足太阴脾经",
+      "region": "lower_limb_distal",
+      "reference_region": "lower_limb_distal",
+      "symptoms": ["dysmenorrhea", "gastrointestinal"],
+      "reference_mode": "region_fallback",
+      "note": "当前使用下肢远端区域PPT参考库。"
+    },
+    {
+      "name": "地机",
+      "code": "SP8",
+      "aliases": ["diji"],
+      "meridian": "足太阴脾经",
+      "region": "lower_limb_distal",
+      "reference_region": "lower_limb_distal",
+      "symptoms": ["dysmenorrhea"],
+      "reference_mode": "region_fallback",
+      "note": "当前使用下肢远端区域PPT参考库。"
+    },
+    {
+      "name": "太冲",
+      "code": "LR3",
+      "aliases": ["taichong"],
+      "meridian": "足厥阴肝经",
+      "region": "lower_limb_distal",
+      "reference_region": "lower_limb_distal",
+      "symptoms": ["other"],
+      "reference_mode": "region_fallback",
+      "note": "当前使用下肢远端区域PPT参考库。"
+    }
+  ]
+}

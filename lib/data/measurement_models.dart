@@ -231,6 +231,10 @@ class ReferenceResult {
   final String note;
   final double pptPressure;
   final double percentile;
+  final String referenceMode;
+  final String matchedAcupointName;
+  final String matchedAcupointCode;
+  final String matchedAcupointMeridian;
 
   const ReferenceResult({
     required this.hasReference,
@@ -240,6 +244,10 @@ class ReferenceResult {
     required this.note,
     required this.pptPressure,
     required this.percentile,
+    this.referenceMode = 'region_reference',
+    this.matchedAcupointName = '',
+    this.matchedAcupointCode = '',
+    this.matchedAcupointMeridian = '',
   });
 
   factory ReferenceResult.unavailable({
@@ -254,6 +262,7 @@ class ReferenceResult {
       note: note,
       pptPressure: pptPressure,
       percentile: 0,
+      referenceMode: 'unavailable',
     );
   }
 }
