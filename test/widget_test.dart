@@ -7,6 +7,12 @@ import 'package:poct_app/util/ml_risk_engine.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
+  test('Sensitization labels use clinical tendency wording', () {
+    expect(SensitizationLevels.label('reference_range'), '无明显敏化倾向');
+    expect(SensitizationLevels.label('high'), '无明显敏化倾向');
+    expect(SensitizationLevels.label('mild_low'), '轻度偏低，建议观察');
+  });
+
   test('AcupointCatalog resolves common names and codes', () async {
     final byName = await AcupointCatalog.resolve('足三里');
     final byCode = await AcupointCatalog.resolve('ST36');
@@ -134,6 +140,8 @@ void main() {
     );
 
     expect(shakyTemp.riskScore - stableTemp.riskScore, lessThan(0.04));
+    expect(stableTemp.reasonText, contains('未显示明显敏化风险'));
+    expect(stableTemp.reasonText, isNot(contains('曲线质量')));
   });
 
   test('MlRiskEngine skips invalid curves', () {

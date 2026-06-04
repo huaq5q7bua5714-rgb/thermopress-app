@@ -162,21 +162,21 @@ class SensitizationEngine {
     if (p < 25) {
       return const SensitizationResult(
         level: 'mild_low',
-        title: '轻度偏低',
-        suggestion: 'PPT处于偏低区间，建议结合患者主诉与历史趋势观察。',
+        title: '轻度偏低，建议观察',
+        suggestion: 'PPT处于偏低区间，暂不作为明确敏化结论，建议结合患者主诉与历史趋势观察。',
       );
     }
     if (p <= 75) {
       return const SensitizationResult(
         level: 'reference_range',
-        title: '参考范围',
+        title: '无明显敏化倾向',
         suggestion: '本次PPT位于参考人群中间区间，未见明显敏化倾向。',
       );
     }
     return const SensitizationResult(
       level: 'high',
-      title: '阈值较高',
-      suggestion: '本次PPT高于多数参考人群，建议主要关注后续趋势变化。',
+      title: '无明显敏化倾向',
+      suggestion: '本次PPT高于多数参考人群，未见明显机械痛敏化倾向，建议主要关注后续趋势变化。',
     );
   }
 }

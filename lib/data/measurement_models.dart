@@ -322,7 +322,7 @@ class MlRiskLevels {
       case 'medium':
         return '中风险';
       case 'low':
-        return '低风险';
+        return '无明显风险';
       case 'uncertain':
         return '证据不足';
       case 'unavailable':
@@ -341,11 +341,11 @@ class SensitizationLevels {
       case 'low':
         return '偏低，可能敏化';
       case 'mild_low':
-        return '轻度偏低';
+        return '轻度偏低，建议观察';
       case 'reference_range':
-        return '参考范围';
+        return '无明显敏化倾向';
       case 'high':
-        return '阈值较高';
+        return '无明显敏化倾向';
       case 'invalid_curve':
         return '曲线无效';
       case 'no_reference':

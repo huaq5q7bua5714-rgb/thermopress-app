@@ -173,7 +173,7 @@ class _MeasurementResultPageState extends State<MeasurementResultPage> {
             if (s.hasMlRisk && s.mlReasonText.isNotEmpty) ...[
               const SizedBox(height: 8),
               Text(
-                '机器学习判别依据：${s.mlReasonText}',
+                '主要影响因素：${s.mlReasonText}',
                 style: TextStyle(
                   fontSize: 13,
                   color: _mlRiskColor(s.mlRiskLevel),
@@ -291,6 +291,7 @@ class _MeasurementResultPageState extends State<MeasurementResultPage> {
       case 'mild_low':
         return Colors.orange;
       case 'reference_range':
+      case 'high':
         return Colors.green;
       default:
         return Colors.blueGrey;

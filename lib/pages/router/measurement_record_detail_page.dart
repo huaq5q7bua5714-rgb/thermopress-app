@@ -573,13 +573,13 @@ class _MeasurementRecordDetailPageState
                                 '评估可信度',
                                 '${(widget.summary.mlConfidence * 100).toStringAsFixed(0)}%',
                               ),
-                              _stat_line('算法版本', widget.summary.mlModelVersion),
+                              _stat_line('算法模型', widget.summary.mlModelVersion),
                               if (widget.summary.mlReasonText.isNotEmpty)
                                 Padding(
                                   padding:
                                       const EdgeInsets.symmetric(vertical: 2),
                                   child: Text(
-                                    '机器学习判别依据：${widget.summary.mlReasonText}',
+                                    '主要影响因素：${widget.summary.mlReasonText}',
                                     style: const TextStyle(
                                       fontSize: 13,
                                       color: Colors.black87,

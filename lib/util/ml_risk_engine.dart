@@ -4,7 +4,7 @@ import 'package:poct_app/data/measurement_models.dart';
 import 'package:poct_app/pages/home/patient_controller.dart';
 
 class MlRiskEngine {
-  static const String modelVersion = 'ml_sensitization_v1';
+  static const String modelVersion = 'ThermoPress SensML';
 
   static MlRiskResult evaluate({
     required CurveAnalysisResult curve,
@@ -91,7 +91,7 @@ class MlRiskEngine {
       sameSiteCount: sameSiteHistory.length,
     );
     final level = _level(score, confidence);
-    final reasons = _topReasons(features);
+    final reasons = score < 0.45 ? <String>[] : _topReasons(features);
 
     return MlRiskResult(
       riskScore: score,
@@ -99,7 +99,7 @@ class MlRiskEngine {
       confidence: confidence,
       modelVersion: modelVersion,
       reasonText: reasons.isEmpty
-          ? '当前特征未显示明显敏化风险，建议结合临床主诉和后续趋势观察。'
+          ? 'PPT与参考百分位未显示明显敏化风险，建议结合临床主诉和后续趋势观察。'
           : reasons.join('；'),
       temperatureRange: tempRange,
       trendDelta: trendDelta,
@@ -158,7 +158,9 @@ class MlRiskEngine {
   static List<String> _topReasons(List<_Feature> features) {
     final ranked = features
         .where((feature) =>
-            feature.value >= 0.35 && feature.value * feature.weight >= 0.15)
+            feature.name != '曲线质量' &&
+            feature.value >= 0.35 &&
+            feature.value * feature.weight >= 0.15)
         .toList()
       ..sort((a, b) => (b.value * b.weight).compareTo(a.value * a.weight));
 
