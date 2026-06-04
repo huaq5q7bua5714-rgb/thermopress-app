@@ -148,22 +148,22 @@ class SensitizationEngine {
     if (p < 5) {
       return const SensitizationResult(
         level: 'marked_low',
-        title: '明显偏低，疑似敏化',
-        suggestion: 'PPT低于参考人群第5百分位，建议结合症状与同侧/对侧测点复核。',
+        title: '高度敏化倾向',
+        suggestion: 'PPT低于参考人群第5百分位，提示该测点敏化程度较高，建议结合症状与相邻测点复核。',
       );
     }
     if (p < 10) {
       return const SensitizationResult(
         level: 'low',
-        title: '偏低，可能敏化',
-        suggestion: 'PPT低于参考人群第10百分位，建议复测或与相邻区域比较。',
+        title: '中度敏化倾向',
+        suggestion: 'PPT低于参考人群第10百分位，提示存在一定敏化倾向，建议复测或与相邻区域比较。',
       );
     }
     if (p < 25) {
       return const SensitizationResult(
         level: 'mild_low',
-        title: '轻度偏低，建议观察',
-        suggestion: 'PPT处于偏低区间，暂不作为明确敏化结论，建议结合患者主诉与历史趋势观察。',
+        title: '轻度敏化倾向',
+        suggestion: 'PPT处于偏低区间，提示轻度敏化倾向，建议结合患者主诉与历史趋势观察。',
       );
     }
     if (p <= 75) {

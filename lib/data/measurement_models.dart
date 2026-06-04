@@ -337,11 +337,11 @@ class SensitizationLevels {
   static String label(String level) {
     switch (level) {
       case 'marked_low':
-        return '明显偏低，疑似敏化';
+        return '高度敏化倾向';
       case 'low':
-        return '偏低，可能敏化';
+        return '中度敏化倾向';
       case 'mild_low':
-        return '轻度偏低，建议观察';
+        return '轻度敏化倾向';
       case 'reference_range':
         return '无明显敏化倾向';
       case 'high':

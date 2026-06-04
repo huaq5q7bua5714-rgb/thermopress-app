@@ -10,7 +10,9 @@ void main() {
   test('Sensitization labels use clinical tendency wording', () {
     expect(SensitizationLevels.label('reference_range'), '无明显敏化倾向');
     expect(SensitizationLevels.label('high'), '无明显敏化倾向');
-    expect(SensitizationLevels.label('mild_low'), '轻度偏低，建议观察');
+    expect(SensitizationLevels.label('marked_low'), '高度敏化倾向');
+    expect(SensitizationLevels.label('low'), '中度敏化倾向');
+    expect(SensitizationLevels.label('mild_low'), '轻度敏化倾向');
   });
 
   test('AcupointCatalog resolves common names and codes', () async {
