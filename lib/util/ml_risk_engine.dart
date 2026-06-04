@@ -54,8 +54,8 @@ class MlRiskEngine {
       ),
       _Feature(
         '温度差异',
-        _clamp01(tempRange / 1.8),
-        0.45,
+        _clamp01(tempRange / 2.5),
+        0.12,
       ),
       _Feature(
         '曲线质量',
@@ -156,7 +156,10 @@ class MlRiskEngine {
   }
 
   static List<String> _topReasons(List<_Feature> features) {
-    final ranked = features.where((feature) => feature.value >= 0.35).toList()
+    final ranked = features
+        .where((feature) =>
+            feature.value >= 0.35 && feature.value * feature.weight >= 0.15)
+        .toList()
       ..sort((a, b) => (b.value * b.weight).compareTo(a.value * a.weight));
 
     return ranked.take(3).map((feature) {

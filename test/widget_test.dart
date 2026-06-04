@@ -73,6 +73,69 @@ void main() {
     expect(result.riskLevel, isNot('unavailable'));
   });
 
+  test('MlRiskEngine treats temperature range as a weak auxiliary feature', () {
+    final curve = CurveAnalysisResult(
+      valid: true,
+      invalidReason: '',
+      algorithmVersion: 'test',
+      pptIndex: 10,
+      pptValue: 42,
+      pptTimeSec: 2.4,
+      pptTemperature: 34.2,
+      peakForce: 42,
+      contactStartSec: 0.4,
+      riseRate: 30,
+      slopeChangeScore: 0.2,
+      peakPptRatio: 1,
+      qualityScore: 80,
+    );
+    const reference = ReferenceResult(
+      hasReference: true,
+      status: 'ok',
+      source: 'test',
+      quality: 'test',
+      note: '',
+      pptPressure: 24,
+      percentile: 35,
+    );
+    final patient = Patient(
+      name: 'test',
+      age: 35,
+      weight: 65,
+      phone: '10086',
+    );
+    final session = MeasurementSessionDraft(
+      sessionId: 'S1',
+      startTime: DateTime(2026, 1, 1),
+      bodyRegion: BodyRegion.upperLimb,
+      symptomType: SymptomType.other,
+      algorithmVersion: 'test',
+    );
+
+    final stableTemp = MlRiskEngine.evaluate(
+      curve: curve,
+      reference: reference,
+      patient: patient,
+      session: session,
+      avgTemp: 34.0,
+      maxTemp: 34.1,
+      minTemp: 34.0,
+      history: const [],
+    );
+    final shakyTemp = MlRiskEngine.evaluate(
+      curve: curve,
+      reference: reference,
+      patient: patient,
+      session: session,
+      avgTemp: 34.0,
+      maxTemp: 36.5,
+      minTemp: 33.0,
+      history: const [],
+    );
+
+    expect(shakyTemp.riskScore - stableTemp.riskScore, lessThan(0.04));
+  });
+
   test('MlRiskEngine skips invalid curves', () {
     final patient = Patient(
       name: 'test',

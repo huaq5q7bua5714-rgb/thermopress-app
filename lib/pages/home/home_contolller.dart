@@ -88,6 +88,17 @@ class HomeController extends GetxController with BleCallback {
   /// Max number of cached points for curve display
   static const int maxPoints = 500;
 
+  void _clearLiveViewForNewMeasurement() {
+    points.clear();
+    recordedPoints.clear();
+    latestTemp.value = 0.0;
+    latestForce.value = 0.0;
+    tempData.value = '';
+    timeData.value = '';
+    recordingStartEpochMs.value = 0.0;
+    chartTick.value++;
+  }
+
   // ====================== MOCK STREAM (for dev) ======================
   Timer? _mockTimer;
   int _mockTick = 0;
@@ -347,6 +358,8 @@ class HomeController extends GetxController with BleCallback {
       return;
     }
 
+    _clearLiveViewForNewMeasurement();
+
     final selection = await Get.dialog<MeasurementSelection>(
       const MeasurementSetupDialog(),
       barrierDismissible: false,
@@ -366,16 +379,6 @@ class HomeController extends GetxController with BleCallback {
     // ✅✅【新增】设置本次录制的时间零点（非常关键）
     recordingStartEpochMs.value =
         sessionStart.millisecondsSinceEpoch.toDouble();
-
-    // ✅ 关键：清空曲线数据，不然会接着上一次画
-    points.clear();
-
-    // （可选）清空 UI 显示的最新值
-    latestTemp.value = 0.0;
-    latestForce.value = 0.0;
-
-    // 清空本次录制缓存
-    recordedPoints.clear();
 
     isRecording.value = true;
 
@@ -613,6 +616,8 @@ class HomeController extends GetxController with BleCallback {
 
   /// When a new sample is received (called inside onDataReceived)
   void _onNewSample(double temp, double force) {
+    if (!isRecording.value) return;
+
     final now = DateTime.now();
 
     latestTemp.value = temp;
@@ -624,10 +629,7 @@ class HomeController extends GetxController with BleCallback {
 
     final point = DataPoint(now, temp, force);
 
-    if (isRecording.value) {
-      recordedPoints.add(point);
-    }
-
+    recordedPoints.add(point);
     points.add(point);
 
     // ✅ sliding window（高效裁剪）
